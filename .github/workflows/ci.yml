@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: 24
+  NODE_VERSION: 26.3.0
 
 jobs:
   # The glyph engine is pure JS (BLAKE3, bit math, Unicode normalization) with no
