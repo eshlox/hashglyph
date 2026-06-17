@@ -27,7 +27,10 @@ function buildDom(search = ''): void {
     <span id="contrast-warning" hidden></span>
     <div id="matrix"></div>
     <div id="qr-preview"></div>
-    <section id="qr-section" hidden></section>
+    <section id="qr-section" hidden>
+      <input id="qr-url" type="text" />
+      <p id="qr-warning" hidden></p>
+    </section>
     <select id="png-size"><option value="256">256</option></select>
     <button id="copy-svg"></button><button id="copy-link"></button>
     <button id="dl-svg"></button><button id="dl-png"></button>
@@ -83,5 +86,33 @@ describe('initGenerator (jsdom — core runs against the DOM)', () => {
     seed.value = '   ';
     fire('seed');
     expect(document.getElementById('seed-error')?.hidden).toBe(false);
+  });
+
+  it('enables QR mode, renders a code, and puts the target in the permalink', () => {
+    initGenerator();
+    const qrToggle = document.getElementById('qr-toggle') as HTMLInputElement;
+    qrToggle.checked = true;
+    fire('qr-toggle', 'change');
+    expect((document.getElementById('qr-section') as HTMLElement).hidden).toBe(false);
+    expect(document.getElementById('qr-preview')?.innerHTML).toContain('<svg');
+
+    const qrUrl = document.getElementById('qr-url') as HTMLInputElement;
+    qrUrl.value = 'https://example.com/me';
+    fire('qr-url');
+    expect(window.location.search).toContain('qrurl=');
+    expect((document.getElementById('permalink') as HTMLInputElement).value).toContain(
+      encodeURIComponent('https://example.com/me'),
+    );
+  });
+
+  it('hydrates QR mode + target from a shared permalink', () => {
+    buildDom('?qrurl=https%3A%2F%2Fexample.org');
+    initGenerator();
+    expect((document.getElementById('qr-toggle') as HTMLInputElement).checked).toBe(true);
+    expect((document.getElementById('qr-section') as HTMLElement).hidden).toBe(false);
+    expect((document.getElementById('qr-url') as HTMLInputElement).value).toBe(
+      'https://example.org',
+    );
+    expect(document.getElementById('qr-preview')?.innerHTML).toContain('<svg');
   });
 });

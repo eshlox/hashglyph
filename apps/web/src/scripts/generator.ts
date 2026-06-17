@@ -15,15 +15,21 @@ import {
   svgToIcoBlob,
   svgToPngBlob,
 } from '../lib/raster.js';
-import { DEFAULT_STATE, type GlyphState, parseState, slugify, toQuery } from '../lib/state.js';
+import {
+  DEFAULT_STATE,
+  type GlyphState,
+  normalizeQrUrl,
+  parseState,
+  QR_URL_WARN_LENGTH,
+  slugify,
+  toQuery,
+} from '../lib/state.js';
 
 function el<T extends HTMLElement>(id: string): T {
   const node = document.getElementById(id);
   if (!node) throw new Error(`Missing #${id}`);
   return node as T;
 }
-
-const QR_URL = 'https://hashglyph.eshlox.net';
 
 /** Wire up the interactive generator. Called once on DOMContentLoaded. */
 export function initGenerator(): void {
@@ -39,6 +45,7 @@ export function initGenerator(): void {
     rounded: el<HTMLInputElement>('rounded'),
     padding: el<HTMLInputElement>('padding'),
     qr: el<HTMLInputElement>('qr-toggle'),
+    qrUrl: el<HTMLInputElement>('qr-url'),
   };
 
   const view = {
@@ -50,6 +57,7 @@ export function initGenerator(): void {
     matrix: el<HTMLDivElement>('matrix'),
     qrPreview: el<HTMLDivElement>('qr-preview'),
     qrWrap: el<HTMLElement>('qr-section'),
+    qrWarn: el<HTMLElement>('qr-warning'),
     seedError: el<HTMLElement>('seed-error'),
   };
 
@@ -62,7 +70,9 @@ export function initGenerator(): void {
   controls.transparent.checked = state.transparent;
   controls.rounded.checked = state.rounded;
   controls.padding.value = String(state.padding);
-  controls.qr.checked = false;
+  controls.qr.checked = state.qrMode;
+  controls.qrUrl.value = state.qrUrl;
+  view.qrWrap.hidden = !state.qrMode;
 
   const svgOptions = (): SvgOptions => ({
     fg: state.fg,
@@ -75,6 +85,13 @@ export function initGenerator(): void {
   const stripProlog = (svg: string) => svg.replace(/^<\?xml[^>]*\?>\s*/, '');
 
   let current: { glyph: Glyph; svg: string } | null = null;
+
+  function updatePermalink(): void {
+    const query = toQuery(state);
+    const url = `${window.location.pathname}${query ? `?${query}` : ''}`;
+    window.history.replaceState(null, '', url);
+    view.permalink.value = `${window.location.origin}${url}`;
+  }
 
   function render(): void {
     const normalized = tryNormalizeSeed(state.seed);
@@ -89,18 +106,14 @@ export function initGenerator(): void {
     view.digest.textContent = glyph.digestHex;
     view.material.textContent = glyph.material;
 
-    // Permalink.
-    const query = toQuery(state);
-    const url = `${window.location.pathname}${query ? `?${query}` : ''}`;
-    window.history.replaceState(null, '', url);
-    view.permalink.value = `${window.location.origin}${url}`;
+    updatePermalink();
 
     // Contrast warning (only meaningful for hex on a visible background).
     const ratio = state.transparent ? null : contrastRatio(state.fg, state.bg);
     view.contrast.hidden = !(ratio !== null && ratio < 1.6);
 
     renderMatrix();
-    if (controls.qr.checked) renderQr();
+    if (state.qrMode) renderQr();
   }
 
   function renderMatrix(): void {
@@ -125,8 +138,10 @@ export function initGenerator(): void {
 
   function renderQr(): void {
     if (!current) return;
-    const qrSvg = renderQrSvg(QR_URL, current.glyph, { glyphCoverage: 0.24 });
+    const target = normalizeQrUrl(state.qrUrl);
+    const qrSvg = renderQrSvg(target, current.glyph, { glyphCoverage: 0.24 });
     view.qrPreview.innerHTML = stripProlog(qrSvg);
+    view.qrWarn.hidden = target.length <= QR_URL_WARN_LENGTH;
   }
 
   // --- Control wiring -------------------------------------------------------
@@ -163,8 +178,14 @@ export function initGenerator(): void {
     render();
   });
   controls.qr.addEventListener('change', () => {
-    view.qrWrap.hidden = !controls.qr.checked;
-    if (controls.qr.checked) renderQr();
+    state.qrMode = controls.qr.checked;
+    view.qrWrap.hidden = !state.qrMode;
+    render();
+  });
+  controls.qrUrl.addEventListener('input', () => {
+    state.qrUrl = controls.qrUrl.value;
+    if (state.qrMode) renderQr();
+    updatePermalink();
   });
 
   // --- Actions --------------------------------------------------------------
@@ -211,7 +232,7 @@ export function initGenerator(): void {
   });
   el<HTMLButtonElement>('dl-qr').addEventListener('click', async () => {
     if (!current) return;
-    const qrSvg = renderQrSvg(QR_URL, current.glyph, { glyphCoverage: 0.24 });
+    const qrSvg = renderQrSvg(normalizeQrUrl(state.qrUrl), current.glyph, { glyphCoverage: 0.24 });
     downloadBlob(await svgToPngBlob(qrSvg, 1024), `${base()}-qr.png`);
   });
   el<HTMLButtonElement>('randomize').addEventListener('click', () => {

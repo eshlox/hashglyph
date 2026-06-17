@@ -151,6 +151,12 @@ const sampleRows = GRAMMARS.map((g) => {
             </div>
 
             <div id="qr-section" class="qr-section" hidden style="width:100%">
+              <div class="field">
+                <label for="qr-url">QR points to</label>
+                <input id="qr-url" type="text" inputmode="url" autocomplete="off"
+                  spellcheck="false" maxlength="512" placeholder="https://your-site.com" />
+                <p id="qr-warning" class="warn" hidden>⚠ Long link — the code gets dense and may be harder to scan with the centered glyph.</p>
+              </div>
               <div id="qr-preview" class="qr-preview"></div>
               <div class="btns" style="justify-content:center">
                 <button id="dl-qr" class="btn" type="button">Download QR (PNG)</button>
