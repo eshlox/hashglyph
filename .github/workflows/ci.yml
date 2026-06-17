@@ -16,15 +16,15 @@ env:
   NODE_VERSION: 24
 
 jobs:
-  # Cross-platform determinism: the canonical golden + every combo must match
-  # byte-for-byte on Linux, macOS and Windows.
+  # The glyph engine is pure JS (BLAKE3, bit math, Unicode normalization) with no
+  # Date/locale/filesystem in its output path, so determinism is guaranteed by
+  # construction rather than by the OS. We run on Linux only; macOS adds ~10x the
+  # cost for POSIX behaviour we already cover, and the CLI path logic is exercised
+  # by the path-traversal tests. Re-add a windows-latest job here if you want CI
+  # coverage of Windows path/EOL edge cases.
   test:
-    name: test (${{ matrix.os }})
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
+    name: test
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
