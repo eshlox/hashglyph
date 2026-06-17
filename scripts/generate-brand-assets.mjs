@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Mint the frozen HashGlyph brand assets for the canonical `eshlox` seed.
+ * Mint HashGlyph's own frozen brand assets (the glyph for the seed `hashglyph`).
  *
  * Writes byte-reproducible masters into `brand/assets/` and the exact files the
  * website references into `apps/web/public/`. Run via `pnpm brand:generate`;

@@ -7,7 +7,7 @@ import { UnknownAlgorithmError } from '../errors.js';
 /** Identifier of a supported hash function. */
 export type HashId = 'blake3' | 'sha256' | 'sha512' | 'sha3-256' | 'sha3-512' | 'keccak256';
 
-/** The default hash. BLAKE3 produces the canonical `eshlox` mark. */
+/** The default hash. BLAKE3 produces the canonical mark for any seed. */
 export const DEFAULT_HASH: HashId = 'blake3';
 
 /** A hash function exposed as a deterministic byte source. */

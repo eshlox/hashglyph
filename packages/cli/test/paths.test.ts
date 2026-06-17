@@ -4,8 +4,8 @@ import { PathEscapeError, resolveInside, slugify } from '../src/index.js';
 
 describe('slugify', () => {
   it.each([
-    ['eshlox', 'eshlox'],
-    ['Eshlox Net!', 'eshlox-net'],
+    ['hashglyph', 'hashglyph'],
+    ['HashGlyph Net!', 'hashglyph-net'],
     ['  spaced  out  ', 'spaced-out'],
     ['CAFÉ', 'cafe'],
     ['a/b\\c', 'a-b-c'],
