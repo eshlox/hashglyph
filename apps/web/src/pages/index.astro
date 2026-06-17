@@ -1,7 +1,7 @@
 ---
 import { GRAMMARS, generateGlyph, HASHES, renderSvg } from '@eshlox/hashglyph-core';
 import Seo from '../components/Seo.astro';
-import { SITE, SITE_DESCRIPTION, SITE_TITLE } from '../lib/site';
+import { SITE, SITE_DESCRIPTION, SITE_TITLE, SOCIAL_LINKS } from '../lib/site';
 import '../styles/global.css';
 
 const TITLE = SITE_TITLE;
@@ -222,8 +222,19 @@ your-name
     </main>
 
     <footer class="wrap">
-      <span>HashGlyph · a deterministic pixel-glyph generator for everyone · made by <a href="https://eshlox.net">eshlox</a></span>
-      <span class="mono">a name → a glyph, forever</span>
+      <div class="footer-line">
+        <span>HashGlyph · a deterministic pixel-glyph generator for everyone · made by <a href="https://eshlox.net">eshlox</a></span>
+        <span class="mono">a name → a glyph, forever</span>
+      </div>
+      <nav class="social" aria-label="eshlox on social media">
+        {
+          SOCIAL_LINKS.map((link) => (
+            <a href={link.href} rel="me noopener" target="_blank">
+              {link.label}
+            </a>
+          ))
+        }
+      </nav>
     </footer>
 
     <script>
