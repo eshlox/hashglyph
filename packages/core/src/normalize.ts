@@ -8,7 +8,7 @@ import { EmptySeedError } from './errors.js';
  *   2. Trim surrounding whitespace.
  *   3. Lowercase.
  *
- * `Eshlox`, ` eshlox `, and `ESHLOX` therefore all resolve to `eshlox`.
+ * `HashGlyph`, ` hashglyph `, and `HASHGLYPH` therefore all resolve to `hashglyph`.
  *
  * @throws {EmptySeedError} if nothing visible remains after normalization.
  */

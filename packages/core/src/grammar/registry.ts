@@ -6,7 +6,7 @@ import { quadFoldV1 } from './quad-fold-v1.js';
 import { symmetricMaskV1 } from './symmetric-mask-v1.js';
 import type { GlyphGrammar, GrammarId } from './types.js';
 
-/** The grammar that produces the canonical `eshlox` mark. */
+/** The default grammar (produces the canonical mark for any seed). */
 export const DEFAULT_GRAMMAR: GrammarId = 'core-accents-v1';
 
 const GRAMMARS_BY_ID: Record<GrammarId, GlyphGrammar> = {
