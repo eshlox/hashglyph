@@ -17,7 +17,7 @@ describe('BitStream', () => {
     ]).toEqual([0, 1, 0, 0, 1, 0, 1, 1]);
   });
 
-  it('matches the canonical accent decisions from byte 0 (0x4b)', () => {
+  it('decodes a byte (0x4b) into eight MSB-first booleans', () => {
     const bs = new BitStream(new Uint8Array([0x4b]));
     const decisions = Array.from({ length: 8 }, () => bs.bool());
     expect(decisions).toEqual([false, true, false, false, true, false, true, true]);

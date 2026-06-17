@@ -3,8 +3,8 @@
  *
  * These describe the *contract*, not the npm package version. Changing any of
  * them changes generated output and therefore MUST be accompanied by a new
- * versioned grammar id (e.g. `-v2`). The canonical `eshlox` mark is frozen
- * against `MATERIAL_SCHEMA = 'v1'` forever.
+ * versioned grammar id (e.g. `-v2`). Every glyph is frozen against
+ * `MATERIAL_SCHEMA = 'v1'` forever.
  */
 
 /** Version of the seed → material recipe (`normalize` + the `id|seed` template). */

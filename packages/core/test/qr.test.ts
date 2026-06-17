@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { buildQrMatrix, generateGlyph, renderQrSvg } from '../src/index.js';
 
 const URL = 'https://hashglyph.eshlox.net';
-const glyph = generateGlyph({ seed: 'eshlox' });
+const glyph = generateGlyph({ seed: 'hashglyph' });
 
 describe('QR rendering', () => {
   it('builds a non-trivial QR matrix', () => {

@@ -32,30 +32,30 @@ function pngSize(data: Uint8Array): { width: number; height: number } {
 describe('runGenerate', () => {
   it('produces an SVG, JSON, and the requested PNG sizes', async () => {
     const { artifacts, summary } = await runGenerate({
-      seed: 'eshlox',
+      seed: 'hashglyph',
       options,
       sizes: [32, 16],
       json: true,
       ascii: false,
     });
-    expect(byName(artifacts, 'eshlox.svg')).toBeDefined();
+    expect(byName(artifacts, 'hashglyph.svg')).toBeDefined();
     expect(artifacts.filter((a) => a.name.endsWith('.png'))).toHaveLength(2);
 
     const json = byName(artifacts, '.json');
     expect(json).toBeDefined();
     const meta = JSON.parse(json?.data as string);
-    expect(meta.normalized).toBe('eshlox');
-    expect(meta.digestHex).toMatch(/^4b343318/);
+    expect(meta.normalized).toBe('hashglyph');
+    expect(meta.digestHex).toMatch(/^bfd24b02/);
     expect(meta.grid).toHaveLength(9);
 
     const png = byName(artifacts, '-32.png');
     expect(isPng(png?.data as Uint8Array)).toBe(true);
-    expect(summary.join('\n')).toContain('eshlox');
+    expect(summary.join('\n')).toContain('hashglyph');
   });
 
   it('skips PNGs when sizes is empty', async () => {
     const { artifacts } = await runGenerate({
-      seed: 'eshlox',
+      seed: 'hashglyph',
       options,
       sizes: [],
       json: false,
@@ -68,13 +68,13 @@ describe('runGenerate', () => {
 
 describe('runFavicon', () => {
   it('produces a complete favicon set with ICO and manifest', async () => {
-    const { artifacts } = await runFavicon({ seed: 'eshlox', options });
+    const { artifacts } = await runFavicon({ seed: 'hashglyph', options });
     const names = artifacts.map((a) => a.name);
     expect(names).toContain('favicon.ico');
     expect(names).toContain('site.webmanifest');
     expect(names).toContain('apple-touch-icon.png');
     for (const size of [16, 32, 48, 180, 192, 512]) {
-      expect(names).toContain(`eshlox-${size}.png`);
+      expect(names).toContain(`hashglyph-${size}.png`);
     }
     const ico = byName(artifacts, '.ico')?.data as Uint8Array;
     const view = new DataView(ico.buffer, ico.byteOffset, ico.byteLength);
@@ -86,7 +86,7 @@ describe('runFavicon', () => {
 
 describe('runOg', () => {
   it('produces a 1200×630 PNG card', async () => {
-    const { artifacts } = await runOg({ seed: 'eshlox', options, og: {} });
+    const { artifacts } = await runOg({ seed: 'hashglyph', options, og: {} });
     const png = byName(artifacts, '-og.png')?.data as Uint8Array;
     expect(isPng(png)).toBe(true);
     expect(pngSize(png)).toEqual({ width: 1200, height: 630 });
@@ -97,7 +97,7 @@ describe('runQr', () => {
   it('produces SVG + PNG, with a glyph when a seed is given', async () => {
     const withGlyph = await runQr({
       url: 'https://hashglyph.eshlox.net',
-      seed: 'eshlox',
+      seed: 'hashglyph',
       options,
       size: 256,
     });
@@ -121,7 +121,7 @@ describe('writeArtifacts', () => {
 
   it('writes files to disk and returns their paths', async () => {
     const { artifacts } = await runGenerate({
-      seed: 'eshlox',
+      seed: 'hashglyph',
       options,
       sizes: [16],
       json: true,
@@ -129,7 +129,7 @@ describe('writeArtifacts', () => {
     });
     const written = await writeArtifacts(dir, artifacts, silentIO);
     expect(written.length).toBe(artifacts.length);
-    const svg = await readFile(join(dir, 'eshlox.svg'), 'utf8');
+    const svg = await readFile(join(dir, 'hashglyph.svg'), 'utf8');
     expect(svg).toContain('<svg');
   });
 

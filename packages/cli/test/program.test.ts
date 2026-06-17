@@ -39,7 +39,7 @@ describe('CLI program', () => {
   it('ascii prints the grid and provenance, writes nothing', async () => {
     const { io, out } = fakeIO();
     const { calls, write } = spyWrite();
-    await run(['ascii', 'eshlox', '--no-color'], io, write);
+    await run(['ascii', 'hashglyph', '--no-color'], io, write);
     expect(out.join('\n')).toContain('blake3 × core-accents-v1');
     expect(calls).toHaveLength(0);
   });
@@ -47,7 +47,7 @@ describe('CLI program', () => {
   it('generate writes artifacts to the chosen directory', async () => {
     const { io } = fakeIO();
     const { calls, write } = spyWrite();
-    await run(['generate', 'eshlox', '--out', 'myout', '--no-png'], io, write);
+    await run(['generate', 'hashglyph', '--out', 'myout', '--no-png'], io, write);
     expect(calls).toHaveLength(1);
     expect(calls[0]?.dir).toBe('myout');
     expect(calls[0]?.artifacts.some((a) => a.name.endsWith('.svg'))).toBe(true);
@@ -55,14 +55,14 @@ describe('CLI program', () => {
 
   it('rejects an unknown hash with a clean error', async () => {
     const { io } = fakeIO();
-    await expect(run(['generate', 'eshlox', '--hash', 'md5', '--no-png'], io)).rejects.toThrow(
+    await expect(run(['generate', 'hashglyph', '--hash', 'md5', '--no-png'], io)).rejects.toThrow(
       /Unknown --hash/,
     );
   });
 
   it('rejects an unsafe color', async () => {
     const { io } = fakeIO();
-    await expect(run(['generate', 'eshlox', '--fg', 'url(#x)', '--no-png'], io)).rejects.toThrow(
+    await expect(run(['generate', 'hashglyph', '--fg', 'url(#x)', '--no-png'], io)).rejects.toThrow(
       /not a valid\/safe color/,
     );
   });

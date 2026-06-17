@@ -9,14 +9,14 @@ terminal-era artifact.
 
 ```
 ·········
-·███████·     blake3( eshlox-deterministic-glyph-v1 | eshlox )
-·██···██·       = 4b343318ccb00312…d600440
+·███████·     blake3( hashglyph-core-accents-v1 | hashglyph )
+·██···██·       = bfd24b02875f3d34…f2ee0010
 ·█·███·█·
-·██·████·     seed:    eshlox
+·███████·     seed:    hashglyph        ← the project's own mark
 ·█·███·█·     hash:    blake3
-·██···██·     grammar: core-accents-v1   (canonical)
+·██···██·     grammar: core-accents-v1   (default)
 ·███████·
-·········
+·········     (type any word to mint your own)
 ```
 
 → **Live generator: [hashglyph.eshlox.net](https://hashglyph.eshlox.net)**
@@ -44,11 +44,11 @@ npx @eshlox/hashglyph-cli generate eshlox --json --ascii
 
 # or install globally
 npm i -g @eshlox/hashglyph-cli
-hashglyph generate eshlox            # SVG + JSON + PNG set → ./dist
-hashglyph favicon eshlox             # full favicon/PWA set + favicon.ico
-hashglyph og eshlox                  # 1200×630 Open Graph card
-hashglyph qr https://you.dev --seed eshlox   # QR with a centered glyph
-hashglyph ascii eshlox               # print it to your terminal
+hashglyph generate your-name         # SVG + JSON + PNG set → ./dist
+hashglyph favicon your-name          # full favicon/PWA set + favicon.ico
+hashglyph og your-name               # 1200×630 Open Graph card
+hashglyph qr https://you.dev --seed your-name   # QR with a centered glyph
+hashglyph ascii your-name            # print it to your terminal
 hashglyph list                       # all hashes × grammars
 ```
 
@@ -57,7 +57,7 @@ hashglyph list                       # all hashes × grammars
 ```ts
 import { generateGlyph, renderSvg } from '@eshlox/hashglyph-core';
 
-const glyph = generateGlyph({ seed: 'eshlox' });   // hash + grammar are pluggable
+const glyph = generateGlyph({ seed: 'your-name' });   // hash + grammar are pluggable
 const svg = renderSvg(glyph, { fg: '#0b0e14', bg: '#ffffff', padding: 1 });
 ```
 
@@ -72,18 +72,20 @@ ${grammar.materialId}|${normalize(seed)}      normalize = NFKC · trim · lowerc
 The hash name is intentionally **not** part of the material, so swapping hashes
 diverges naturally while a fixed `(hash, grammar)` pair stays frozen forever.
 
-The canonical mark is `blake3` + `core-accents-v1`. Verify it yourself:
+The default grammar is `core-accents-v1`. HashGlyph's own logo is just the glyph
+for the seed `hashglyph` — verify it yourself:
 
 ```js
 import { blake3 } from '@noble/hashes/blake3.js';
 import { bytesToHex, utf8ToBytes } from '@noble/hashes/utils.js';
 
-bytesToHex(blake3(utf8ToBytes('eshlox-deterministic-glyph-v1|eshlox'), { dkLen: 64 }));
-// → 4b343318ccb00312918f026859a895c7cba8de501c4dd05281e9244998b160c0…
+bytesToHex(blake3(utf8ToBytes('hashglyph-core-accents-v1|hashglyph'), { dkLen: 64 }));
+// → bfd24b02875f3d34cd6e99511319eb8c3933bd54563973a40dfec2c8833e27ad…
 ```
 
-Hash bits are read **most-significant-first**; the first 8 bits (`0x4b` =
-`01001011`) decide the eight accent pixels: `false,true,false,false,true,false,true,true`.
+Hash bits are read **most-significant-first**; the first 8 bits decide the eight
+accent pixels. Every seed gets the same treatment — your name maps to exactly
+one mark, forever.
 
 ## Algorithms: hash × grammar
 

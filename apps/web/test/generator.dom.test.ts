@@ -43,11 +43,11 @@ function fire(id: string, type = 'input'): void {
 describe('initGenerator (jsdom — core runs against the DOM)', () => {
   beforeEach(() => buildDom());
 
-  it('renders the canonical eshlox glyph on load', () => {
+  it('renders the canonical mark on load', () => {
     initGenerator();
-    expect(document.getElementById('digest')?.textContent).toMatch(/^4b343318/);
+    expect(document.getElementById('digest')?.textContent).toMatch(/^bfd24b02/);
     expect(document.getElementById('material')?.textContent).toBe(
-      'eshlox-deterministic-glyph-v1|eshlox',
+      'hashglyph-core-accents-v1|hashglyph',
     );
     expect(document.getElementById('preview')?.innerHTML).toContain('<svg');
   });
@@ -61,13 +61,11 @@ describe('initGenerator (jsdom — core runs against the DOM)', () => {
     initGenerator();
     const before = document.getElementById('digest')?.textContent;
     const seed = document.getElementById('seed') as HTMLInputElement;
-    seed.value = 'vertolabs';
+    seed.value = 'ada';
     fire('seed');
     expect(document.getElementById('digest')?.textContent).not.toBe(before);
-    expect(window.location.search).toContain('seed=vertolabs');
-    expect((document.getElementById('permalink') as HTMLInputElement).value).toContain(
-      'seed=vertolabs',
-    );
+    expect(window.location.search).toContain('seed=ada');
+    expect((document.getElementById('permalink') as HTMLInputElement).value).toContain('seed=ada');
   });
 
   it('hydrates from URL params (permalink round-trip)', () => {
