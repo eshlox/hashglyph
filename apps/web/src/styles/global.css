@@ -483,9 +483,34 @@ footer {
   color: var(--faint);
   font-size: 0.85rem;
   display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.footer-line {
+  display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 12px;
+}
+.social {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.social a {
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 5px 14px;
+  font-size: 0.82rem;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
+}
+.social a:hover {
+  border-color: var(--accent);
+  color: var(--text);
+  text-decoration: none;
 }
 
 .visually-hidden {

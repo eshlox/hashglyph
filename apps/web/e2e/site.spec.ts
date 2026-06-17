@@ -13,6 +13,26 @@ test.describe('HashGlyph site', () => {
     );
     const jsonLd = await page.locator('script[type="application/ld+json"]').textContent();
     expect(jsonLd).toContain('SoftwareApplication');
+    expect(jsonLd).toContain('https://fosstodon.org/@eshlox'); // sameAs
+  });
+
+  test('shows the author social links in the footer', async ({ page }) => {
+    await page.goto('/');
+    const social = page.locator('.social');
+    await expect(social.getByRole('link', { name: 'X' })).toHaveAttribute(
+      'href',
+      'https://x.com/eshlox',
+    );
+    await expect(social.getByRole('link', { name: 'Bluesky' })).toHaveAttribute(
+      'href',
+      'https://bsky.app/profile/eshlox.net',
+    );
+    await expect(social.getByRole('link', { name: 'Mastodon' })).toHaveAttribute(
+      'href',
+      'https://fosstodon.org/@eshlox',
+    );
+    // rel="me" enables Mastodon's verified-link checkmark.
+    await expect(social.getByRole('link', { name: 'Mastodon' })).toHaveAttribute('rel', /me/);
   });
 
   test('shows the canonical mark on first load (core runs in-browser)', async ({ page }) => {
