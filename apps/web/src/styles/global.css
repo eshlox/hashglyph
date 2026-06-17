@@ -477,9 +477,50 @@ table.matrix-table td.mono {
   color: var(--muted);
 }
 
-footer {
+/* ---- Glossary ---- */
+.glossary-head {
+  margin: 28px 0 6px;
+  font-size: 1rem;
+  font-family: var(--mono);
+  color: var(--accent);
+}
+.glossary {
+  margin: 0;
+  display: grid;
+  gap: 2px;
+}
+.glossary-row {
+  display: grid;
+  grid-template-columns: minmax(170px, 0.9fr) 2.4fr;
+  gap: 8px 22px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.glossary-row dt {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.glossary-row dt code {
+  display: inline-block;
+  color: var(--accent);
+  font-size: 0.82rem;
+}
+.glossary-row dd {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+@media (max-width: 620px) {
+  .glossary-row {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}
+
+/* `footer.wrap` so these win over `.wrap { padding: 0 20px }` (class beats element). */
+footer.wrap {
   border-top: 1px solid var(--border);
-  padding: 32px 0 56px;
+  padding: 40px 20px 48px;
   color: var(--faint);
   font-size: 0.85rem;
   display: flex;

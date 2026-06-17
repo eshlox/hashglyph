@@ -16,7 +16,7 @@ describe('parseState', () => {
   });
 
   it('falls back to safe defaults for invalid params (never throws)', () => {
-    const s = parseState('hash=md5&grammar=evil&fg=url(%23x)&padding=99');
+    const s = parseState('hash=crc32&grammar=evil&fg=url(%23x)&padding=99');
     expect(s.hash).toBe('blake3');
     expect(s.grammar).toBe('core-accents-v1');
     expect(s.fg).toBe(DEFAULT_STATE.fg);

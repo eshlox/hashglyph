@@ -33,7 +33,7 @@ describe('CLI program', () => {
     const text = out.join('\n');
     expect(text).toContain('blake3');
     expect(text).toContain('core-accents-v1');
-    expect(text).toContain('30 combinations');
+    expect(text).toContain('85 combinations');
   });
 
   it('ascii prints the grid and provenance, writes nothing', async () => {
@@ -55,7 +55,7 @@ describe('CLI program', () => {
 
   it('rejects an unknown hash with a clean error', async () => {
     const { io } = fakeIO();
-    await expect(run(['generate', 'hashglyph', '--hash', 'md5', '--no-png'], io)).rejects.toThrow(
+    await expect(run(['generate', 'hashglyph', '--hash', 'crc32', '--no-png'], io)).rejects.toThrow(
       /Unknown --hash/,
     );
   });

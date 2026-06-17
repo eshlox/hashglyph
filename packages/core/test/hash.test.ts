@@ -3,18 +3,44 @@ import { getHash, HASH_IDS, HASHES, isHashId, UnknownAlgorithmError } from '../s
 
 describe('hash registry', () => {
   it('exposes all expected hashes', () => {
-    expect(HASH_IDS).toEqual(['blake3', 'sha256', 'sha512', 'sha3-256', 'sha3-512', 'keccak256']);
+    expect(HASH_IDS).toEqual([
+      'blake3',
+      'blake2b',
+      'blake2s',
+      'sha256',
+      'sha224',
+      'sha384',
+      'sha512',
+      'sha512-256',
+      'sha3-256',
+      'sha3-512',
+      'shake128',
+      'shake256',
+      'keccak256',
+      'keccak512',
+      'ripemd160',
+      'sha1',
+      'md5',
+    ]);
     expect(HASHES).toHaveLength(HASH_IDS.length);
   });
 
   it('isHashId narrows known/unknown ids', () => {
     expect(isHashId('blake3')).toBe(true);
-    expect(isHashId('md5')).toBe(false);
+    expect(isHashId('md5')).toBe(true);
+    expect(isHashId('crc32')).toBe(false);
   });
 
   it('throws UnknownAlgorithmError for unknown ids', () => {
     // @ts-expect-error testing the runtime guard with an invalid id
-    expect(() => getHash('md5')).toThrow(UnknownAlgorithmError);
+    expect(() => getHash('crc32')).toThrow(UnknownAlgorithmError);
+  });
+
+  it('SHAKE expansion is a true XOF (prefix-stable)', () => {
+    for (const id of ['shake128', 'shake256'] as const) {
+      const x = getHash(id);
+      expect(x.expand('hashglyph|test', 64).slice(0, 32)).toEqual(x.expand('hashglyph|test', 32));
+    }
   });
 
   describe('expand()', () => {

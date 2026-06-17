@@ -59,7 +59,7 @@ test.describe('HashGlyph site', () => {
   });
 
   test('invalid permalink params fall back to defaults (never throws)', async ({ page }) => {
-    await page.goto('/?grammar=evil&hash=md5&fg=url(%23x)');
+    await page.goto('/?grammar=evil&hash=crc32&fg=url(%23x)');
     await expect(page.locator('#preview svg')).toBeVisible();
     await expect(page.locator('#grammar')).toHaveValue('core-accents-v1');
     await expect(page.locator('#hash')).toHaveValue('blake3');
