@@ -10,7 +10,7 @@ import type { GlyphGrammar } from './types.js';
 export const mirrorIdenticonV1: GlyphGrammar = {
   id: 'mirror-identicon-v1',
   label: 'Mirror Identicon',
-  description: 'Vertically mirrored identicon — classic GitHub-style symmetry.',
+  description: 'Vertically mirrored identicon, classic GitHub-style symmetry.',
   materialId: 'hashglyph-mirror-identicon-v1',
   byteBudget: 6, // ceil(5 cols * 9 rows / 8)
   build({ bits }) {

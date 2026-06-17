@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "HashGlyph — a deterministic pixel-glyph logo system. Turn any name into a stable, hashed digital signature.",
+  "description": "HashGlyph is a deterministic pixel-glyph logo system. Turn any name into a stable, hashed digital signature.",
   "license": "MIT",
   "author": "eshlox <eshlox@vertolabs.com>",
   "homepage": "https://hashglyph.eshlox.net",

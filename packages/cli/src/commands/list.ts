@@ -2,7 +2,7 @@ import { GRAMMARS, HASHES } from '@eshlox/hashglyph-core';
 import pc from 'picocolors';
 import type { CommandResult } from '../artifacts.js';
 
-/** `list` — show every available hash and grammar. No files written. */
+/** `list`: show every available hash and grammar. No files written. */
 export function runList(): CommandResult {
   const summary: string[] = [pc.bold('Hashes:')];
   for (const h of HASHES) {

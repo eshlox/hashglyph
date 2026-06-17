@@ -29,7 +29,7 @@ function webmanifest(name: string): string {
   return `${JSON.stringify(manifest, null, 2)}\n`;
 }
 
-/** `favicon` — a full favicon/PWA set: PNGs + favicon.ico + site.webmanifest. */
+/** `favicon`: a full favicon/PWA set: PNGs + favicon.ico + site.webmanifest. */
 export async function runFavicon(input: FaviconInput): Promise<CommandResult> {
   const glyph = generateGlyph({
     seed: input.seed,

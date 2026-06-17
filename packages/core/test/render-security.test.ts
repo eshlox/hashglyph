@@ -30,7 +30,7 @@ describe('SVG renderer is XSS-safe', () => {
       expect(svg).not.toMatch(/<img/i);
       expect(svg).not.toMatch(/<foreignObject/i);
       // The seed is present only in its fully escaped form, inside <title>.
-      const expectedTitle = `<title>${escapeXml(`HashGlyph — ${seed}`)}</title>`;
+      const expectedTitle = `<title>${escapeXml(`HashGlyph glyph for "${seed}"`)}</title>`;
       expect(svg).toContain(expectedTitle);
       // Structurally intact: a single root and exactly one title.
       expect(svg.match(/<svg/g)).toHaveLength(1);

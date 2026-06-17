@@ -10,7 +10,7 @@ import type { GlyphGrammar } from './types.js';
 export const quadFoldV1: GlyphGrammar = {
   id: 'quad-fold-v1',
   label: 'Quad Fold',
-  description: 'Four-fold kaleidoscopic symmetry — ornamental and balanced.',
+  description: 'Four-fold kaleidoscopic symmetry, ornamental and balanced.',
   materialId: 'hashglyph-quad-fold-v1',
   byteBudget: 4, // 5 * 5 = 25 quadrant cells
   build({ bits }) {

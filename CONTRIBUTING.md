@@ -11,7 +11,7 @@ The whole point of HashGlyph is that a seed maps to the same glyph forever. So:
 - To evolve the visual system, register a **new** grammar with an incremented
   version suffix (e.g. `core-accents-v2`) and keep the old one in the registry.
 - The canonical golden test (`packages/core/test/canonical.golden.test.ts`) must
-  never need updating. If it fails, you broke the contract — revert.
+  never need updating. If it fails, you broke the contract, so revert.
 
 The same applies to the normalization recipe and material template
 (`MATERIAL_SCHEMA`) and the MSB-first bitstream order.
@@ -22,7 +22,7 @@ The same applies to the normalization recipe and material template
    Declare a unique `materialId`, a `byteBudget`, and make it mirror-symmetric
    so output reads as a mark.
 2. Register it in `grammar/registry.ts` and `GRAMMAR_IDS`.
-3. Add a determinism snapshot — the per-combo snapshot test will pick it up.
+3. Add a determinism snapshot. The per-combo snapshot test will pick it up.
 4. `pnpm test && pnpm typecheck && pnpm check`.
 
 ## Workflow
@@ -37,7 +37,7 @@ pnpm --filter @eshlox/hashglyph-web check   # astro check
 ```
 
 - TypeScript, ESM, strict. Match the surrounding style; Biome formats.
-- Keep `packages/core` **isomorphic** — no `node:` imports or Node globals
+- Keep `packages/core` **isomorphic**, with no `node:` imports or Node globals
   (enforced by `isomorphism.test.ts`).
 - New behaviour needs tests. Security-relevant code needs adversarial tests.
 

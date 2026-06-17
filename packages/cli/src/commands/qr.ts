@@ -13,7 +13,7 @@ export interface QrInput {
   colors?: Pick<QrOptions, 'fg' | 'bg'>;
 }
 
-/** `qr` — a QR code (optionally with a centered glyph) as SVG + PNG. */
+/** `qr`: a QR code (optionally with a centered glyph) as SVG + PNG. */
 export async function runQr(input: QrInput): Promise<CommandResult> {
   const glyph = input.seed
     ? generateGlyph({ seed: input.seed, hash: input.options.hash, grammar: input.options.grammar })

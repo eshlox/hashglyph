@@ -9,7 +9,7 @@ export interface AsciiInput {
   color: boolean;
 }
 
-/** `ascii` — print the glyph to the terminal. No files written. */
+/** `ascii`: print the glyph to the terminal. No files written. */
 export function runAscii(input: AsciiInput): CommandResult {
   const glyph = generateGlyph({
     seed: input.seed,

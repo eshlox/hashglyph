@@ -2,7 +2,7 @@
  * A tiny built-in 5×7 pixel font, rendered as SVG `<rect>`s.
  *
  * Why a hand-rolled font? The OG image must be a *frozen, reproducible* brand
- * asset — generating identical bytes on any machine. Relying on system fonts
+ * asset, generating identical bytes on any machine. Relying on system fonts
  * (via librsvg/fontconfig) would make output depend on which fonts happen to be
  * installed. Drawing text as pixels removes that dependency entirely and suits
  * a pixel-glyph tool perfectly. Text is upper-cased for a clean terminal vibe.

@@ -2,7 +2,7 @@ import { isAbsolute, resolve, sep } from 'node:path';
 
 /**
  * Convert an arbitrary seed into a filesystem-safe slug. Never used as a path
- * on its own — always combined with a directory you control and re-checked by
+ * on its own, always combined with a directory you control and re-checked by
  * {@link resolveInside}. Strips anything outside `[a-z0-9-]`, collapses runs of
  * separators, trims, and caps length. Falls back to `glyph` if nothing remains.
  */

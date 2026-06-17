@@ -4,8 +4,8 @@
 
 HashGlyph turns any word into a deterministic, pixel-based logo. The seed is
 normalized, hashed with **BLAKE3**, and mapped onto a constrained 9×9 visual
-grammar. Same seed → same mark, forever — part monogram, part favicon, part
-terminal-era artifact.
+grammar. The same seed always gives the same mark. It reads like part monogram,
+part favicon, part terminal-era artifact.
 
 ```
 ·········
@@ -28,11 +28,11 @@ terminal-era artifact.
 Most generated identicons look random. HashGlyph keeps the **brand structure
 designed** and lets the **hash drive only the accents**:
 
-- **deterministic** — the same input always yields the same mark;
-- **personal** — the seed is your name;
-- **technical** — generated from a cryptographic hash;
-- **scalable** — crisp from a 16px favicon to a wall-sized SVG;
-- **story-driven** — a compressed digital signature, not a generic icon.
+- **deterministic:** the same input always yields the same mark;
+- **personal:** the seed is your own name;
+- **technical:** it comes straight out of a cryptographic hash;
+- **scalable:** it stays crisp from a 16px favicon to a wall-sized SVG;
+- **story-driven:** it's a compressed digital signature, not a generic icon.
 
 ## Quick start
 
@@ -73,7 +73,7 @@ The hash name is intentionally **not** part of the material, so swapping hashes
 diverges naturally while a fixed `(hash, grammar)` pair stays frozen forever.
 
 The default grammar is `core-accents-v1`. HashGlyph's own logo is just the glyph
-for the seed `hashglyph` — verify it yourself:
+for the seed `hashglyph`, and you can verify it yourself:
 
 ```js
 import { blake3 } from '@noble/hashes/blake3.js';
@@ -84,12 +84,12 @@ bytesToHex(blake3(utf8ToBytes('hashglyph-core-accents-v1|hashglyph'), { dkLen: 6
 ```
 
 Hash bits are read **most-significant-first**; the first 8 bits decide the eight
-accent pixels. Every seed gets the same treatment — your name maps to exactly
+accent pixels. Every seed gets the same treatment, so your name maps to exactly
 one mark, forever.
 
 ## Algorithms: hash × grammar
 
-Pluggable on two axes — **6 hashes × 5 grammars = 30 combinations**. The
+It's pluggable on two axes: **6 hashes × 5 grammars = 30 combinations**. The
 default combo mints the canonical mark; the rest are yours to explore.
 
 | Hashes | Grammars |
@@ -140,7 +140,7 @@ Requires Node ≥ 24 and pnpm.
 
 ## Deploying the site (Cloudflare Pages)
 
-The site is fully static (generation runs client-side — no SSR adapter).
+The site is fully static. Generation runs client-side, so there's no SSR adapter.
 
 - **Build command:** `pnpm install && pnpm -r build && pnpm --filter @eshlox/hashglyph-web build`
 - **Output directory:** `apps/web/dist`
@@ -150,7 +150,7 @@ The site is fully static (generation runs client-side — no SSR adapter).
 
 The canonical mark must never change. Grammars are pinned with a version suffix
 and frozen on release. To evolve the visual system, register a **new** grammar
-(e.g. `core-accents-v2`) — never edit a shipped `-v1`. See [CONTRIBUTING.md](./CONTRIBUTING.md).
+(e.g. `core-accents-v2`) and never edit a shipped `-v1`. See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## Security
 

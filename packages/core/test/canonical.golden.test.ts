@@ -3,8 +3,8 @@ import { generateGlyph, gridToAscii, renderSvg } from '../src/index.js';
 
 /**
  * The frozen contract. The default grammar (`core-accents-v1`) + BLAKE3 must
- * forever map a seed to the same mark. We pin the project's own logo — the
- * glyph for the seed `hashglyph` — as the canonical regression guard. Treat a
+ * forever map a seed to the same mark. We pin the project's own logo, the
+ * glyph for the seed `hashglyph`, as the canonical regression guard. Treat a
  * failure here as a release-blocking break of the determinism promise, not a
  * snapshot to update.
  */

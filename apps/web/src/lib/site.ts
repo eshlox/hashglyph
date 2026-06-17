@@ -2,15 +2,15 @@
 
 export const SITE = 'https://hashglyph.eshlox.net';
 
-export const SITE_TITLE = 'HashGlyph — Deterministic Pixel Glyphs from Any Name';
+export const SITE_TITLE = 'HashGlyph: Deterministic Pixel Glyphs from Any Name';
 
 export const SITE_DESCRIPTION =
-  'HashGlyph turns any name into a stable, hashed pixel logo. Deterministic, BLAKE3-seeded, and favicon-ready — generate and download SVG, PNG, ICO and QR marks in your browser.';
+  'HashGlyph turns any name into a stable, hashed pixel logo. It is deterministic, BLAKE3-seeded, and favicon-ready, so you can generate and download SVG, PNG, ICO and QR marks right in your browser.';
 
 /**
  * Build the JSON-LD `@graph` for the homepage. Kept in one place so the CSP
  * hash test in `test/csp.test.ts` can verify the deployed `_headers` policy
- * matches the exact inline content — `JSON.stringify(buildJsonLd())` must equal
+ * matches the exact inline content, so `JSON.stringify(buildJsonLd())` must equal
  * what Astro emits via `set:html`.
  */
 export function buildJsonLd(site: string = SITE, description: string = SITE_DESCRIPTION) {

@@ -51,7 +51,7 @@ describe('property: generateGlyph invariants for all inputs', () => {
         expect(svg).not.toMatch(/<script/i);
         expect((svg.match(/<svg/g) ?? []).length).toBe(1);
         // The seed only ever appears in its fully escaped <title> form.
-        expect(svg).toContain(`<title>${escapeXml(`HashGlyph — ${seed}`)}</title>`);
+        expect(svg).toContain(`<title>${escapeXml(`HashGlyph glyph for "${seed}"`)}</title>`);
       }),
       { numRuns: 300 },
     );

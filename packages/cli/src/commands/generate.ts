@@ -30,7 +30,7 @@ function metadataJson(glyph: ReturnType<typeof generateGlyph>): string {
   return `${JSON.stringify(meta, null, 2)}\n`;
 }
 
-/** `generate` — the core command: SVG (+ optional JSON + PNGs) for a seed. */
+/** `generate`: the core command: SVG (+ optional JSON + PNGs) for a seed. */
 export async function runGenerate(input: GenerateInput): Promise<CommandResult> {
   const { seed, options, sizes, json, ascii } = input;
   const glyph = generateGlyph({ seed, hash: options.hash, grammar: options.grammar });

@@ -1,6 +1,6 @@
 # @eshlox/hashglyph-core
 
-The isomorphic engine behind [HashGlyph](https://hashglyph.eshlox.net) —
+The isomorphic engine behind [HashGlyph](https://hashglyph.eshlox.net):
 deterministic pixel glyphs from any seed. Runs identically in Node and the
 browser, with zero Node-only dependencies.
 

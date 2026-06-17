@@ -28,7 +28,7 @@ ever touching SVG attributes. Anything else is rejected.
 ### 3. Path traversal (untrusted seed → filename)
 
 CLI output filenames are derived from a strict slug (`[a-z0-9-]`, length-capped)
-— never from the raw seed. Every write is resolved through `resolveInside`,
+and never from the raw seed. Every write is resolved through `resolveInside`,
 which rejects absolute paths and any `..` that would escape the chosen output
 directory.
 
@@ -48,7 +48,7 @@ byte-reproducible and verified in CI (`pnpm brand:verify`).
 
 BLAKE3 here is a deterministic randomness source for graphics, **not** a
 security primitive. Do not use HashGlyph (or raw BLAKE3/SHA) for password
-storage — use Argon2id/scrypt/bcrypt.
+storage; use Argon2id, scrypt, or bcrypt instead.
 
 ## Reporting a vulnerability
 

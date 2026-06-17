@@ -35,8 +35,8 @@ export function buildQrMatrix(data: string, level: QrLevel = 'H') {
 /**
  * Render a QR code as a self-contained SVG, optionally with a HashGlyph
  * composited in the centre. The glyph area (plus a one-module pad) is cleared
- * to the background and kept small (≤ 30% of the code) so that — combined with
- * error-correction level H — the code still scans. The three finder patterns in
+ * to the background and kept small (≤ 30% of the code) so that, combined with
+ * error-correction level H, the code still scans. The three finder patterns in
  * the corners are never covered.
  */
 export function renderQrSvg(data: string, glyph: Glyph | null, options: QrOptions = {}): string {

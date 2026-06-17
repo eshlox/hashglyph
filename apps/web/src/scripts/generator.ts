@@ -102,8 +102,8 @@ export function initGenerator(): void {
       current = null;
       view.preview.replaceChildren();
       view.qrPreview.replaceChildren();
-      view.digest.textContent = '—';
-      view.material.textContent = '—';
+      view.digest.textContent = '…';
+      view.material.textContent = '…';
       updatePermalink();
       return;
     }
@@ -134,7 +134,7 @@ export function initGenerator(): void {
       const button = document.createElement('button');
       button.type = 'button';
       button.className = `matrix-cell${grammar.id === state.grammar ? ' is-active' : ''}`;
-      button.title = `${grammar.label} — ${grammar.description}`;
+      button.title = `${grammar.label}: ${grammar.description}`;
       button.setAttribute('aria-pressed', String(grammar.id === state.grammar));
       button.innerHTML = `<span class="matrix-art">${stripProlog(swatch)}</span><span class="matrix-label">${grammar.label}</span>`;
       button.addEventListener('click', () => {
