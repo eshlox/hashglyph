@@ -6,3 +6,15 @@ packages:
 allowBuilds:
   esbuild: true
   sharp: true
+
+# Audit advisories ignored because they affect only dev/build tooling
+# (vitest→esbuild, astro-check→yaml) and never reach the published packages
+# or the static site output:
+#   GHSA-gv7w-rqvm-qjhr  esbuild — Deno binary integrity (we don't use Deno)
+#   GHSA-g7r4-m6w7-qqqr  esbuild — dev-server file read on Windows (dev only)
+#   GHSA-48c2-rrv3-qjmp  yaml    — stack overflow in @astrojs/check lang server
+auditConfig:
+  ignoreGhsas:
+    - GHSA-gv7w-rqvm-qjhr
+    - GHSA-g7r4-m6w7-qqqr
+    - GHSA-48c2-rrv3-qjmp
