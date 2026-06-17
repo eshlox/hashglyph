@@ -10,7 +10,8 @@ import { runQr } from './commands/qr.js';
 import type { IO } from './io.js';
 import {
   DEFAULT_PNG_SIZES,
-  OptionError,
+  MAX_RENDER_SIZE,
+  parseRenderSize,
   type RawGlyphOptions,
   resolveGlyphOptions,
 } from './options.js';
@@ -26,12 +27,18 @@ interface BuildOptions {
   exitOverride?: boolean;
 }
 
-function addGlyphOptions(cmd: Command): Command {
+/** Hash + grammar selection (which glyph), plus its colours. */
+function addGlyphPickerOptions(cmd: Command): Command {
   return cmd
     .option('--hash <id>', 'hash function (see `list`)', 'blake3')
     .option('--grammar <id>', 'visual grammar (see `list`)', 'core-accents-v1')
     .option('--fg <color>', 'foreground color (hex/name)')
-    .option('--bg <color>', 'background color, or "none" for transparent')
+    .option('--bg <color>', 'background color, or "none" for transparent');
+}
+
+/** Full render options for raster commands (adds shape/padding/scale). */
+function addGlyphOptions(cmd: Command): Command {
+  return addGlyphPickerOptions(cmd)
     .option('--rounded', 'use rounded pixels')
     .option('--padding <cells>', 'quiet-zone padding in cells')
     .option('--scale <px>', 'rendered pixels per cell');
@@ -39,11 +46,11 @@ function addGlyphOptions(cmd: Command): Command {
 
 function collect(value: string, previous: number[]): number[] {
   const n = Number(value);
-  if (!Number.isInteger(n) || n <= 0) {
+  if (!Number.isInteger(n) || n < 1 || n > MAX_RENDER_SIZE) {
     throw new CommanderError(
       1,
       'hashglyph.size',
-      `--size must be a positive integer, got "${value}".`,
+      `--size must be an integer between 1 and ${MAX_RENDER_SIZE}, got "${value}".`,
     );
   }
   return [...previous, n];
@@ -122,7 +129,7 @@ export function buildProgram(opts: BuildOptions): Command {
     await runAndWrite(raw.out, await runOg({ seed, options, og }));
   });
 
-  addGlyphOptions(
+  addGlyphPickerOptions(
     program
       .command('qr <url>')
       .description('Generate a QR code, optionally with a centered glyph')
@@ -131,11 +138,14 @@ export function buildProgram(opts: BuildOptions): Command {
       .option('--size <px>', 'PNG size', '1024'),
   ).action(async (url: string, raw: RawGlyphOptions & QrFlags) => {
     const options = resolveGlyphOptions(raw);
-    const size = Number(raw.size);
-    if (!Number.isInteger(size) || size <= 0) {
-      throw new OptionError(`--size must be a positive integer, got "${raw.size}".`);
-    }
-    await runAndWrite(raw.out, await runQr({ url, seed: raw.seed ?? null, options, size }));
+    const size = parseRenderSize('size', raw.size);
+    // --fg/--bg recolour the QR (the centered glyph inherits them). The other
+    // glyph render options don't apply to a QR, so they aren't offered here.
+    const colors = {
+      ...(typeof options.svg.fg === 'string' ? { fg: options.svg.fg } : {}),
+      ...(typeof options.svg.bg === 'string' ? { bg: options.svg.bg } : {}),
+    };
+    await runAndWrite(raw.out, await runQr({ url, seed: raw.seed ?? null, options, size, colors }));
   });
 
   addGlyphOptions(

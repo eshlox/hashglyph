@@ -1,12 +1,11 @@
 ---
 import { GRAMMARS, generateGlyph, HASHES, renderSvg } from '@eshlox/hashglyph-core';
 import Seo from '../components/Seo.astro';
+import { SITE, SITE_DESCRIPTION, SITE_TITLE } from '../lib/site';
 import '../styles/global.css';
 
-const SITE = 'https://hashglyph.eshlox.net';
-const TITLE = 'HashGlyph — Deterministic Pixel Glyphs from Any Name';
-const DESCRIPTION =
-  'HashGlyph turns any name into a stable, hashed pixel logo. Deterministic, BLAKE3-seeded, and favicon-ready — generate and download SVG, PNG, ICO and QR marks in your browser.';
+const TITLE = SITE_TITLE;
+const DESCRIPTION = SITE_DESCRIPTION;
 
 const stripProlog = (svg: string) => svg.replace(/^<\?xml[^>]*\?>\s*/, '');
 

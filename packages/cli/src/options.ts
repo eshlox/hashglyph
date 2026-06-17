@@ -31,11 +31,29 @@ export class OptionError extends Error {
   override readonly name = 'OptionError';
 }
 
-function parseIntOption(label: string, value: string | undefined): number | undefined {
+/** Hard cap on any rasterized pixel dimension, to bound sharp memory/CPU. */
+export const MAX_RENDER_SIZE = 8192;
+/** Hard cap on quiet-zone padding (cells). */
+export const MAX_PADDING = 64;
+/** Hard cap on SVG pixels-per-cell. */
+export const MAX_SCALE = 512;
+
+function parseIntOption(label: string, value: string | undefined, max: number): number | undefined {
   if (value === undefined) return undefined;
   const n = Number(value);
-  if (!Number.isInteger(n) || n < 0) {
-    throw new OptionError(`--${label} must be a non-negative integer, got "${value}".`);
+  if (!Number.isInteger(n) || n < 0 || n > max) {
+    throw new OptionError(`--${label} must be an integer between 0 and ${max}, got "${value}".`);
+  }
+  return n;
+}
+
+/** Validate a positive rasterization size (1..MAX_RENDER_SIZE). */
+export function parseRenderSize(label: string, value: string): number {
+  const n = Number(value);
+  if (!Number.isInteger(n) || n < 1 || n > MAX_RENDER_SIZE) {
+    throw new OptionError(
+      `--${label} must be an integer between 1 and ${MAX_RENDER_SIZE}, got "${value}".`,
+    );
   }
   return n;
 }
@@ -61,8 +79,8 @@ export function resolveGlyphOptions(raw: RawGlyphOptions): ResolvedGlyphOptions 
 
   const pixel: PixelShape = raw.rounded ? 'rounded' : 'square';
   const fg = resolveColor('fg', raw.fg);
-  const padding = parseIntOption('padding', raw.padding);
-  const scale = parseIntOption('scale', raw.scale);
+  const padding = parseIntOption('padding', raw.padding, MAX_PADDING);
+  const scale = parseIntOption('scale', raw.scale, MAX_SCALE);
 
   // `--bg none|transparent` → no background.
   let bg: string | null | undefined;

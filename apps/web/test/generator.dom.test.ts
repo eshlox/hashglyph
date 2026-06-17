@@ -79,13 +79,17 @@ describe('initGenerator (jsdom — core runs against the DOM)', () => {
     expect((document.getElementById('hash') as HTMLSelectElement).value).toBe('sha256');
   });
 
-  it('shows a validation message for a seed that normalizes to empty', () => {
+  it('shows a validation message and clears the stale glyph for an empty seed', () => {
     initGenerator();
+    expect(document.getElementById('preview')?.innerHTML).toContain('<svg');
     const seed = document.getElementById('seed') as HTMLInputElement;
     // A single space stays "space" (slice keeps it) → tryNormalizeSeed === null.
     seed.value = '   ';
     fire('seed');
     expect(document.getElementById('seed-error')?.hidden).toBe(false);
+    // Stale glyph is cleared, not left pointing at the previous one.
+    expect(document.getElementById('preview')?.innerHTML).toBe('');
+    expect(document.getElementById('digest')?.textContent).toBe('—');
   });
 
   it('enables QR mode, renders a code, and puts the target in the permalink', () => {

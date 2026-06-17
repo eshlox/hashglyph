@@ -29,6 +29,20 @@ describe('normalizeSeed', () => {
     expect(normalizeSeed('🚀rocket')).toBe('🚀rocket');
   });
 
+  it('strips default-ignorable (invisible) code points', () => {
+    const zwsp = String.fromCharCode(0x200b);
+    const bom = String.fromCharCode(0xfeff);
+    const softHyphen = String.fromCharCode(0xad);
+    expect(normalizeSeed(`a${zwsp}b${bom}c`)).toBe('abc');
+    expect(normalizeSeed(`soft${softHyphen}hyphen`)).toBe('softhyphen');
+  });
+
+  it('treats an all-invisible seed as empty', () => {
+    const zwsp = String.fromCharCode(0x200b);
+    const zwj = String.fromCharCode(0x200d);
+    expect(() => normalizeSeed(`${zwsp}${zwj}`)).toThrow(EmptySeedError);
+  });
+
   it.each(['', '   ', '\t\n', '  '])('throws EmptySeedError for %j', (input) => {
     expect(() => normalizeSeed(input)).toThrow(EmptySeedError);
   });

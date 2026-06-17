@@ -67,6 +67,33 @@ describe('CLI program', () => {
     );
   });
 
+  it('rejects an out-of-range PNG size', async () => {
+    const { io } = fakeIO();
+    await expect(run(['generate', 'hashglyph', '--size', '99999'], io)).rejects.toThrow(
+      /between 1 and 8192/,
+    );
+  });
+
+  it('rejects an out-of-range qr size', async () => {
+    const { io } = fakeIO();
+    await expect(run(['qr', 'https://x.test', '--size', '99999'], io)).rejects.toThrow(
+      /between 1 and 8192/,
+    );
+  });
+
+  it('passes --fg/--bg through to the QR code', async () => {
+    const { io } = fakeIO();
+    const { calls, write } = spyWrite();
+    await run(
+      ['qr', 'https://x.test', '--fg', '#ff0000', '--bg', '#00ff00', '--out', 'o'],
+      io,
+      write,
+    );
+    const svg = calls[0]?.artifacts.find((a) => a.name.endsWith('.svg'))?.data as string;
+    expect(svg).toContain('#ff0000');
+    expect(svg).toContain('#00ff00');
+  });
+
   it('supports --version', async () => {
     const { io, out } = fakeIO();
     await expect(run(['--version'], io)).rejects.toThrow(); // exitOverride throws on version

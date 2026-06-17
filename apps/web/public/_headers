@@ -4,7 +4,7 @@
   X-Frame-Options: DENY
   Permissions-Policy: geolocation=(), microphone=(), camera=(), interest-cohort=()
   Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
-  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; manifest-src 'self'
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'none'; script-src 'self' 'sha256-h7dwNlq07qootOR3hsAroSFYqfZcFennoMgkitR5IkA='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; manifest-src 'self'
 
 /assets/*
   Cache-Control: public, max-age=31536000, immutable

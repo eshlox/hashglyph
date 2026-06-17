@@ -1,4 +1,6 @@
 ---
+import { buildJsonLd } from '../lib/site';
+
 interface Props {
   title: string;
   description: string;
@@ -9,28 +11,8 @@ const { title, description, site } = Astro.props;
 const canonical = site;
 const ogImage = `${site}/og-image.png`;
 
-const jsonLd = {
-  '@context': 'https://schema.org',
-  '@graph': [
-    {
-      '@type': 'WebSite',
-      '@id': `${site}/#website`,
-      url: `${site}/`,
-      name: 'HashGlyph',
-      description,
-    },
-    {
-      '@type': 'SoftwareApplication',
-      name: 'HashGlyph',
-      applicationCategory: 'DesignApplication',
-      operatingSystem: 'Any',
-      description,
-      url: `${site}/`,
-      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-      author: { '@type': 'Person', name: 'eshlox' },
-    },
-  ],
-};
+// Single source of truth; the CSP hash in `_headers` is verified against this.
+const jsonLd = buildJsonLd(site, description);
 ---
 
 <meta charset="utf-8" />
