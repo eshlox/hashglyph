@@ -108,6 +108,20 @@ describe('runQr', () => {
     const plain = await runQr({ url: 'https://x.test', seed: null, options, size: 128 });
     expect(byName(plain.artifacts, 'qr.svg')).toBeDefined();
   });
+
+  it('recolors the QR (modules + glyph) when colors are given', async () => {
+    const { artifacts } = await runQr({
+      url: 'https://x.test',
+      seed: 'hashglyph',
+      options,
+      size: 128,
+      colors: { fg: '#ff0000', bg: '#00ff00' },
+    });
+    const svg = byName(artifacts, '-qr.svg')?.data as string;
+    expect(svg).toContain('#ff0000');
+    expect(svg).toContain('#00ff00');
+    expect(svg).not.toContain('#000000'); // default black is replaced
+  });
 });
 
 describe('writeArtifacts', () => {

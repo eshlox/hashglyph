@@ -96,7 +96,17 @@ export function initGenerator(): void {
   function render(): void {
     const normalized = tryNormalizeSeed(state.seed);
     view.seedError.hidden = normalized !== null;
-    if (normalized === null) return;
+    if (normalized === null) {
+      // Invalid seed: drop the stale glyph so previews/downloads don't point at
+      // the previous one. Download handlers all guard on `current`.
+      current = null;
+      view.preview.replaceChildren();
+      view.qrPreview.replaceChildren();
+      view.digest.textContent = '—';
+      view.material.textContent = '—';
+      updatePermalink();
+      return;
+    }
 
     const glyph = generateGlyph({ seed: state.seed, hash: state.hash, grammar: state.grammar });
     const svg = renderSvg(glyph, svgOptions());

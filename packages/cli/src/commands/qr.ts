@@ -1,4 +1,4 @@
-import { generateGlyph, renderQrSvg } from '@eshlox/hashglyph-core';
+import { generateGlyph, type QrOptions, renderQrSvg } from '@eshlox/hashglyph-core';
 import type { CommandResult } from '../artifacts.js';
 import type { ResolvedGlyphOptions } from '../options.js';
 import { slugify } from '../paths.js';
@@ -9,6 +9,8 @@ export interface QrInput {
   seed: string | null;
   options: ResolvedGlyphOptions;
   size: number;
+  /** Optional QR module / background colours (the glyph inherits them). */
+  colors?: Pick<QrOptions, 'fg' | 'bg'>;
 }
 
 /** `qr` — a QR code (optionally with a centered glyph) as SVG + PNG. */
@@ -16,7 +18,7 @@ export async function runQr(input: QrInput): Promise<CommandResult> {
   const glyph = input.seed
     ? generateGlyph({ seed: input.seed, hash: input.options.hash, grammar: input.options.grammar })
     : null;
-  const svg = renderQrSvg(input.url, glyph);
+  const svg = renderQrSvg(input.url, glyph, input.colors ?? {});
   const png = await svgToPng(svg, input.size);
   const base = glyph ? `${slugify(glyph.normalized)}-qr` : 'qr';
 
