@@ -140,11 +140,38 @@ Requires Node ≥ 24 and pnpm.
 
 ## Deploying the site (Cloudflare Pages)
 
-The site is fully static. Generation runs client-side, so there's no SSR adapter.
+The site is fully static. Generation runs client-side, so there is no SSR
+adapter and no `wrangler.toml`. Deployment relies on three in-repo conventions
+plus a few dashboard settings.
 
-- **Build command:** `pnpm install && pnpm -r build && pnpm --filter @eshlox/hashglyph-web build`
-- **Output directory:** `apps/web/dist`
-- **Custom domain:** `hashglyph.eshlox.net`
+**In the repo (already set up):**
+
+1. `package.json` pins the package manager so Cloudflare's corepack installs the
+   right pnpm: `"packageManager": "pnpm@11.7.0"`. Without this you get
+   `No preset version installed for command pnpm`.
+2. `.nvmrc` pins the build's Node version (`22.16.0`). The engine range is
+   broadened to `"node": ">=22.12.0"` so the same code runs on Cloudflare's
+   Node 22 and on local/CI Node 24.
+3. `pnpm-workspace.yaml` whitelists the native install scripts Astro needs via
+   `allowBuilds: { esbuild: true, sharp: true }`.
+
+The committed `pnpm-lock.yaml` plus `packageManager` let Cloudflare auto-detect
+pnpm, so you don't override the install command.
+
+**In the Cloudflare Pages dashboard** (Settings → Builds & deployments):
+
+| Setting | Value |
+| --- | --- |
+| Framework preset | Astro (or None) |
+| Build command | `pnpm build:web` |
+| Build output directory | `apps/web/dist` |
+| Install command | `pnpm install` (auto) |
+| Root directory | `/` |
+
+Because this is a monorepo, the build command is `pnpm build:web`, which builds
+`@eshlox/hashglyph-core` first and then the Astro app (the site imports the core
+engine). The output lands in `apps/web/dist`. Point your custom domain
+`hashglyph.eshlox.net` at the Pages project and you're done.
 
 ## Stability policy
 

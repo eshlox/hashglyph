@@ -1,4 +1,4 @@
-import { sep } from 'node:path';
+import { resolve, sep } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { PathEscapeError, resolveInside, slugify } from '../src/index.js';
 
@@ -30,7 +30,9 @@ describe('slugify', () => {
 });
 
 describe('resolveInside (path-traversal guard)', () => {
-  const base = `${sep}tmp${sep}out`;
+  // Resolve the base so it is already drive-qualified on Windows
+  // (otherwise `resolve` prepends the cwd drive and the literal compare fails).
+  const base = resolve(sep, 'tmp', 'out');
 
   it('resolves names within the base directory', () => {
     expect(resolveInside(base, 'file.svg')).toBe(`${base}${sep}file.svg`);
