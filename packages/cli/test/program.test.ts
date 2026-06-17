@@ -1,0 +1,75 @@
+import { describe, expect, it } from 'vitest';
+import { type Artifact, buildProgram, type IO } from '../src/index.js';
+
+function fakeIO(): { io: IO; out: string[]; err: string[] } {
+  const out: string[] = [];
+  const err: string[] = [];
+  return {
+    io: { log: (m = '') => out.push(m), warn: (m) => err.push(m), error: (m) => err.push(m) },
+    out,
+    err,
+  };
+}
+
+/** A write spy so command parsing can be tested without touching the disk. */
+function spyWrite() {
+  const calls: { dir: string; artifacts: readonly Artifact[] }[] = [];
+  const write = async (dir: string, artifacts: readonly Artifact[]) => {
+    calls.push({ dir, artifacts });
+    return artifacts.map((a) => `${dir}/${a.name}`);
+  };
+  return { calls, write };
+}
+
+async function run(argv: string[], io: IO, write = spyWrite().write) {
+  const program = buildProgram({ io, write, exitOverride: true });
+  await program.parseAsync(['node', 'hashglyph', ...argv]);
+}
+
+describe('CLI program', () => {
+  it('list prints all hashes and grammars', async () => {
+    const { io, out } = fakeIO();
+    await run(['list'], io);
+    const text = out.join('\n');
+    expect(text).toContain('blake3');
+    expect(text).toContain('core-accents-v1');
+    expect(text).toContain('30 combinations');
+  });
+
+  it('ascii prints the grid and provenance, writes nothing', async () => {
+    const { io, out } = fakeIO();
+    const { calls, write } = spyWrite();
+    await run(['ascii', 'eshlox', '--no-color'], io, write);
+    expect(out.join('\n')).toContain('blake3 × core-accents-v1');
+    expect(calls).toHaveLength(0);
+  });
+
+  it('generate writes artifacts to the chosen directory', async () => {
+    const { io } = fakeIO();
+    const { calls, write } = spyWrite();
+    await run(['generate', 'eshlox', '--out', 'myout', '--no-png'], io, write);
+    expect(calls).toHaveLength(1);
+    expect(calls[0]?.dir).toBe('myout');
+    expect(calls[0]?.artifacts.some((a) => a.name.endsWith('.svg'))).toBe(true);
+  });
+
+  it('rejects an unknown hash with a clean error', async () => {
+    const { io } = fakeIO();
+    await expect(run(['generate', 'eshlox', '--hash', 'md5', '--no-png'], io)).rejects.toThrow(
+      /Unknown --hash/,
+    );
+  });
+
+  it('rejects an unsafe color', async () => {
+    const { io } = fakeIO();
+    await expect(run(['generate', 'eshlox', '--fg', 'url(#x)', '--no-png'], io)).rejects.toThrow(
+      /not a valid\/safe color/,
+    );
+  });
+
+  it('supports --version', async () => {
+    const { io, out } = fakeIO();
+    await expect(run(['--version'], io)).rejects.toThrow(); // exitOverride throws on version
+    expect(out.join('\n')).toContain('1.0.0');
+  });
+});

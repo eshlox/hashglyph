@@ -1,0 +1,33 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# build output
+dist/
+**/dist/
+*.tsbuildinfo
+
+# astro
+apps/web/.astro/
+apps/web/.vercel/
+apps/web/.wrangler/
+
+# test / coverage
+coverage/
+playwright-report/
+test-results/
+.vitest/
+
+# scratch output (CLI default out dir when run ad-hoc)
+/out/
+/tmp-glyph/
+
+# editor / os
+.DS_Store
+*.log
+.idea/
+.vscode/*
+!.vscode/extensions.json
+.env
+.env.*
+!.env.example

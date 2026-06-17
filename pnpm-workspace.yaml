@@ -1,0 +1,8 @@
+packages:
+  - "packages/*"
+  - "apps/*"
+
+# Native/binary packages whose install scripts we trust to run.
+allowBuilds:
+  esbuild: true
+  sharp: true

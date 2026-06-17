@@ -1,0 +1,89 @@
+// @vitest-environment jsdom
+import { GRAMMARS, HASHES } from '@eshlox/hashglyph-core';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { initGenerator } from '../src/scripts/generator.ts';
+
+const hashOptions = HASHES.map((h) => `<option value="${h.id}">${h.label}</option>`).join('');
+const grammarOptions = GRAMMARS.map((g) => `<option value="${g.id}">${g.label}</option>`).join('');
+
+/** Build the minimal DOM that initGenerator expects. */
+function buildDom(search = ''): void {
+  window.history.replaceState(null, '', `/${search}`);
+  document.body.innerHTML = `
+    <input id="seed" type="text" />
+    <p id="seed-error" hidden></p>
+    <select id="hash">${hashOptions}</select>
+    <select id="grammar">${grammarOptions}</select>
+    <input id="fg" type="color" />
+    <input id="bg" type="color" />
+    <input id="transparent" type="checkbox" />
+    <input id="rounded" type="checkbox" />
+    <input id="padding" type="range" min="0" max="4" />
+    <input id="qr-toggle" type="checkbox" />
+    <div id="preview"></div>
+    <code id="digest"></code>
+    <code id="material"></code>
+    <input id="permalink" type="text" />
+    <span id="contrast-warning" hidden></span>
+    <div id="matrix"></div>
+    <div id="qr-preview"></div>
+    <section id="qr-section" hidden></section>
+    <select id="png-size"><option value="256">256</option></select>
+    <button id="copy-svg"></button><button id="copy-link"></button>
+    <button id="dl-svg"></button><button id="dl-png"></button>
+    <button id="dl-ico"></button><button id="dl-zip"></button>
+    <button id="dl-qr"></button><button id="randomize"></button>
+  `;
+}
+
+function fire(id: string, type = 'input'): void {
+  document.getElementById(id)?.dispatchEvent(new window.Event(type, { bubbles: true }));
+}
+
+describe('initGenerator (jsdom — core runs against the DOM)', () => {
+  beforeEach(() => buildDom());
+
+  it('renders the canonical eshlox glyph on load', () => {
+    initGenerator();
+    expect(document.getElementById('digest')?.textContent).toMatch(/^4b343318/);
+    expect(document.getElementById('material')?.textContent).toBe(
+      'eshlox-deterministic-glyph-v1|eshlox',
+    );
+    expect(document.getElementById('preview')?.innerHTML).toContain('<svg');
+  });
+
+  it('populates the grammar matrix with every grammar', () => {
+    initGenerator();
+    expect(document.querySelectorAll('#matrix .matrix-cell')).toHaveLength(GRAMMARS.length);
+  });
+
+  it('updates the glyph and permalink when the seed changes', () => {
+    initGenerator();
+    const before = document.getElementById('digest')?.textContent;
+    const seed = document.getElementById('seed') as HTMLInputElement;
+    seed.value = 'vertolabs';
+    fire('seed');
+    expect(document.getElementById('digest')?.textContent).not.toBe(before);
+    expect(window.location.search).toContain('seed=vertolabs');
+    expect((document.getElementById('permalink') as HTMLInputElement).value).toContain(
+      'seed=vertolabs',
+    );
+  });
+
+  it('hydrates from URL params (permalink round-trip)', () => {
+    buildDom('?seed=portal&grammar=quad-fold-v1&hash=sha256');
+    initGenerator();
+    expect((document.getElementById('seed') as HTMLInputElement).value).toBe('portal');
+    expect((document.getElementById('grammar') as HTMLSelectElement).value).toBe('quad-fold-v1');
+    expect((document.getElementById('hash') as HTMLSelectElement).value).toBe('sha256');
+  });
+
+  it('shows a validation message for a seed that normalizes to empty', () => {
+    initGenerator();
+    const seed = document.getElementById('seed') as HTMLInputElement;
+    // A single space stays "space" (slice keeps it) → tryNormalizeSeed === null.
+    seed.value = '   ';
+    fire('seed');
+    expect(document.getElementById('seed-error')?.hidden).toBe(false);
+  });
+});

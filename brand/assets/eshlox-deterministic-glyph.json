@@ -1,0 +1,154 @@
+{
+  "seed": "eshlox",
+  "normalized": "eshlox",
+  "hashId": "blake3",
+  "grammarId": "core-accents-v1",
+  "materialId": "eshlox-deterministic-glyph-v1",
+  "material": "eshlox-deterministic-glyph-v1|eshlox",
+  "digestHex": "4b343318ccb00312918f026859a895c7cba8de501c4dd05281e9244998b160c0efd87842589ba89f98f772030b83780a247e4528c738ecdfa837cc705d600440",
+  "grid": [
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0
+    ],
+    [
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0
+    ],
+    [
+      0,
+      1,
+      0,
+      1,
+      1,
+      1,
+      0,
+      1,
+      0
+    ],
+    [
+      0,
+      1,
+      1,
+      0,
+      1,
+      1,
+      1,
+      1,
+      0
+    ],
+    [
+      0,
+      1,
+      0,
+      1,
+      1,
+      1,
+      0,
+      1,
+      0
+    ],
+    [
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0
+    ],
+    [
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  ],
+  "decisions": [
+    {
+      "x": 4,
+      "y": 1,
+      "enabled": false
+    },
+    {
+      "x": 1,
+      "y": 4,
+      "enabled": true
+    },
+    {
+      "x": 7,
+      "y": 4,
+      "enabled": false
+    },
+    {
+      "x": 4,
+      "y": 7,
+      "enabled": false
+    },
+    {
+      "x": 4,
+      "y": 3,
+      "enabled": true
+    },
+    {
+      "x": 3,
+      "y": 4,
+      "enabled": false
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "enabled": true
+    },
+    {
+      "x": 4,
+      "y": 5,
+      "enabled": true
+    }
+  ],
+  "schema": "v1",
+  "generator": "@eshlox/hashglyph-cli"
+}

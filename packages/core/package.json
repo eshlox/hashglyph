@@ -1,0 +1,52 @@
+{
+  "name": "@eshlox/hashglyph-core",
+  "version": "1.0.0",
+  "description": "Deterministic pixel-glyph engine: seed → hash → 9×9 visual grammar → SVG. Isomorphic (browser + Node).",
+  "license": "MIT",
+  "author": "eshlox <eshlox@vertolabs.com>",
+  "homepage": "https://hashglyph.eshlox.net",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eshlox/hashglyph.git",
+    "directory": "packages/core"
+  },
+  "keywords": [
+    "logo",
+    "identicon",
+    "glyph",
+    "deterministic",
+    "blake3",
+    "favicon",
+    "svg",
+    "branding"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "clean": "rm -rf dist *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@noble/hashes": "2.2.0",
+    "@nuintun/qrcode": "5.0.3",
+    "fflate": "0.8.3"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

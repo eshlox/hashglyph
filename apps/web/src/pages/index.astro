@@ -1,0 +1,231 @@
+---
+import { GRAMMARS, generateGlyph, HASHES, renderSvg } from '@eshlox/hashglyph-core';
+import Seo from '../components/Seo.astro';
+import '../styles/global.css';
+
+const SITE = 'https://hashglyph.eshlox.net';
+const TITLE = 'HashGlyph — Deterministic Pixel Glyphs from Any Name';
+const DESCRIPTION =
+  'HashGlyph turns any name into a stable, hashed pixel logo. Deterministic, BLAKE3-seeded, and favicon-ready — generate and download SVG, PNG, ICO and QR marks in your browser.';
+
+const stripProlog = (svg: string) => svg.replace(/^<\?xml[^>]*\?>\s*/, '');
+
+// The brand mark IS the canonical eshlox glyph, computed at build time.
+const brandMark = stripProlog(
+  renderSvg(generateGlyph({ seed: 'eshlox' }), { padding: 1, scale: 10 }),
+);
+
+// Sample marks for the matrix reference table.
+const sampleRows = GRAMMARS.map((g) => {
+  const glyph = generateGlyph({ seed: 'eshlox', grammar: g.id });
+  return { id: g.id, label: g.label, digest: glyph.digestHex.slice(0, 12) };
+});
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <Seo title={TITLE} description={DESCRIPTION} site={SITE} />
+  </head>
+  <body>
+    <header class="wrap topbar">
+      <a class="brand" href="/" aria-label="HashGlyph home">
+        <Fragment set:html={brandMark} />
+        <span>HashGlyph</span>
+      </a>
+      <nav>
+        <a href="#studio">Generate</a>
+        <a href="#how">How it works</a>
+        <a href="#algorithms">Algorithms</a>
+        <a href="https://github.com/eshlox/hashglyph">GitHub</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="wrap hero">
+        <span class="eyebrow">deterministic · BLAKE3-seeded · 9×9</span>
+        <h1>A name in. <span class="grad">A glyph out.</span><br />Always the same one.</h1>
+        <p class="lead">
+          HashGlyph hashes a word into a constrained pixel grammar to mint a compact digital
+          signature — part monogram, part favicon, part terminal-era artifact. Same seed, same mark,
+          forever.
+        </p>
+        <div class="slogans">
+          <span>your name, compiled to pixels</span>
+          <span>a hash you can hang on the wall</span>
+          <span>git-versionable identity</span>
+        </div>
+      </section>
+
+      <!-- ===================== STUDIO ===================== -->
+      <section id="studio" class="wrap">
+        <div class="studio">
+          <!-- Controls -->
+          <div class="card">
+            <h2>Forge your glyph</h2>
+
+            <div class="field">
+              <label for="seed">Seed</label>
+              <input id="seed" type="text" autocomplete="off" spellcheck="false" maxlength="64"
+                placeholder="type any word…" />
+              <p id="seed-error" class="error" hidden>Seed is empty after normalization — try real characters.</p>
+            </div>
+
+            <div class="row">
+              <div class="field">
+                <label for="hash">Hash</label>
+                <select id="hash">
+                  {HASHES.map((h) => <option value={h.id}>{h.label}</option>)}
+                </select>
+              </div>
+              <div class="field">
+                <label for="grammar">Grammar</label>
+                <select id="grammar">
+                  {GRAMMARS.map((g) => <option value={g.id}>{g.label}</option>)}
+                </select>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="field">
+                <label for="fg">Pixel color</label>
+                <div class="swatch"><input id="fg" type="color" /><span class="mono">fg</span></div>
+              </div>
+              <div class="field">
+                <label for="bg">Background</label>
+                <div class="swatch"><input id="bg" type="color" /><span class="mono">bg</span></div>
+              </div>
+              <div class="field">
+                <label for="padding">Quiet zone</label>
+                <input id="padding" type="range" min="0" max="4" step="1" />
+              </div>
+            </div>
+
+            <div class="row" style="gap:18px;margin-bottom:6px">
+              <label class="toggle"><input id="rounded" type="checkbox" /> Rounded pixels</label>
+              <label class="toggle"><input id="transparent" type="checkbox" /> Transparent</label>
+              <label class="toggle"><input id="qr-toggle" type="checkbox" /> QR mode</label>
+            </div>
+            <p id="contrast-warning" class="warn" hidden>⚠ Low contrast — this may be hard to read at favicon sizes.</p>
+
+            <div class="btns">
+              <button id="randomize" class="btn" type="button">🎲 Surprise me</button>
+            </div>
+
+            <div class="provenance">
+              <div class="kv">
+                <span>material</span><code id="material"></code>
+                <span>blake3 / 64</span><code id="digest"></code>
+              </div>
+            </div>
+          </div>
+
+          <!-- Preview + actions -->
+          <div class="card preview-stage">
+            <div class="preview-frame" id="preview" role="img" aria-label="Live glyph preview"></div>
+
+            <div class="btns" style="justify-content:center">
+              <button id="dl-svg" class="btn primary" type="button">Download SVG</button>
+              <span class="inline-select">
+                <button id="dl-png" class="btn" type="button">PNG</button>
+                <select id="png-size" aria-label="PNG size">
+                  <option value="1024">1024</option>
+                  <option value="512">512</option>
+                  <option value="256" selected>256</option>
+                  <option value="64">64</option>
+                  <option value="32">32</option>
+                  <option value="16">16</option>
+                </select>
+              </span>
+              <button id="dl-ico" class="btn" type="button">favicon.ico</button>
+              <button id="dl-zip" class="btn" type="button">⬇ All assets (.zip)</button>
+              <button id="copy-svg" class="btn" type="button">Copy SVG</button>
+            </div>
+
+            <div style="width:100%">
+              <label for="permalink" class="visually-hidden">Shareable permalink</label>
+              <div class="permabar">
+                <input id="permalink" type="text" readonly class="mono" />
+                <button id="copy-link" class="btn" type="button">Copy link</button>
+              </div>
+            </div>
+
+            <div id="qr-section" class="qr-section" hidden style="width:100%">
+              <div id="qr-preview" class="qr-preview"></div>
+              <div class="btns" style="justify-content:center">
+                <button id="dl-qr" class="btn" type="button">Download QR (PNG)</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Algorithm matrix -->
+        <div class="card" style="margin-top:22px">
+          <h3>Switch the visual grammar</h3>
+          <div id="matrix" class="matrix" aria-label="Available grammars"></div>
+        </div>
+      </section>
+
+      <!-- ===================== HOW IT WORKS ===================== -->
+      <section id="how" class="block">
+        <div class="wrap">
+          <h2>How it works</h2>
+          <p>
+            The seed is normalized, combined with a frozen algorithm id, and hashed. The resulting
+            bits are read most-significant-first and poured into a constrained 9×9 visual grammar. A
+            fixed brand core keeps the mark recognizable; the hash only drives a few accents. The
+            output is pure, deterministic, and reproducible anywhere.
+          </p>
+          <div class="pipeline">eshlox
+  ↓ <b>normalize</b>            NFKC · trim · lowercase
+eshlox
+  ↓ <b>domain separation</b>   core-accents-v1|eshlox
+  ↓ <b>BLAKE3</b>              4b343318ccb00312…
+  ↓ <b>bitstream</b>           MSB-first → grammar
+9×9 glyph
+  ↓ <b>render</b>             SVG · PNG · ICO · QR</div>
+
+          <div class="features">
+            <div class="feature"><span class="ic">// deterministic</span><h3>Same in, same out</h3><p>One seed maps to exactly one mark — forever. No timestamps, no randomness.</p></div>
+            <div class="feature"><span class="ic">// designed</span><h3>Not an identicon</h3><p>A fixed brand core makes it read as a logo; the hash only paints the accents.</p></div>
+            <div class="feature"><span class="ic">// portable</span><h3>Everywhere</h3><p>Crisp from 16px favicons to wall-sized SVG. Generation runs entirely in your browser.</p></div>
+            <div class="feature"><span class="ic">// frozen</span><h3>Versioned forever</h3><p>Grammars are pinned with a version suffix. Your logo never changes under you.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== ALGORITHMS ===================== -->
+      <section id="algorithms" class="block">
+        <div class="wrap">
+          <h2>Pick your algorithm</h2>
+          <p>
+            HashGlyph is pluggable on two axes: <strong>{HASHES.length} hash functions</strong> ×
+            <strong>{GRAMMARS.length} visual grammars</strong> = {HASHES.length * GRAMMARS.length}
+            combinations. BLAKE3 + Core&nbsp;+&nbsp;Accents is the canonical default that mints the
+            official mark; the rest are yours to explore.
+          </p>
+          <table class="matrix-table">
+            <thead><tr><th>Grammar</th><th>Style</th><th>blake3(eshlox)</th></tr></thead>
+            <tbody>
+              {sampleRows.map((r) => (
+                <tr><td>{r.label}</td><td class="mono">{r.id}</td><td class="mono">{r.digest}…</td></tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer class="wrap">
+      <span>HashGlyph · a deterministic pixel-glyph system for <a href="https://eshlox.net">eshlox.net</a></span>
+      <span class="mono">blake3(core-accents-v1|eshlox) = 4b343318…</span>
+    </footer>
+
+    <script>
+      import { initGenerator } from '../scripts/generator.js';
+      const start = () => initGenerator();
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
+      else start();
+    </script>
+  </body>
+</html>
