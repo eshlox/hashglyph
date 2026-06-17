@@ -136,7 +136,7 @@ pnpm --filter @eshlox/hashglyph-web test:e2e   # Playwright
 pnpm brand:verify    # regenerate brand assets and assert no drift
 ```
 
-Requires Node ≥ 26.3.0 and pnpm.
+Requires Node ≥ 24.13.1 and pnpm.
 
 ## Deploying the site (Cloudflare Pages)
 
@@ -149,9 +149,10 @@ plus a few dashboard settings.
 1. `package.json` pins the package manager so Cloudflare's corepack installs the
    right pnpm: `"packageManager": "pnpm@11.7.0"`. Without this you get
    `No preset version installed for command pnpm`.
-2. `.nvmrc` pins the build's Node version (`26.3.0`), which is what Cloudflare
-   Pages reads to pick the runtime. `engines` requires `"node": ">=26.3.0"` to
-   match, so local, CI, and Cloudflare all build on the same Node.
+2. `.nvmrc` pins the build's Node version (`24.13.1`), which is what Cloudflare
+   Pages reads to pick the runtime (it's the newest Node the Pages build image
+   currently offers). `engines` requires `"node": ">=24.13.1"` to match, so
+   local, CI, and Cloudflare all build on the same Node.
 3. `pnpm-workspace.yaml` whitelists the native install scripts Astro needs via
    `allowBuilds: { esbuild: true, sharp: true }`.
 
