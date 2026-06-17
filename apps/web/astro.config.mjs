@@ -7,6 +7,9 @@ export default defineConfig({
   site: 'https://hashglyph.eshlox.net',
   output: 'static',
   trailingSlash: 'ignore',
+  // Emit to the repo-root `dist/` so Cloudflare Pages' default output directory
+  // ("dist") finds it without extra dashboard config in this monorepo.
+  outDir: '../../dist',
   integrations: [sitemap()],
   build: {
     assets: 'assets',

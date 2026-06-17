@@ -33,7 +33,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm -r --filter "./packages/*" build
+      - run: pnpm build:packages
       - run: pnpm typecheck
       - run: pnpm test
 
@@ -48,7 +48,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm -r --filter "./packages/*" build
+      - run: pnpm build:packages
       - run: pnpm check
       - run: pnpm --filter @eshlox/hashglyph-web check
 
@@ -63,7 +63,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm -r --filter "./packages/*" build
+      - run: pnpm build:packages
       - run: pnpm --filter @eshlox/hashglyph-web exec playwright install --with-deps chromium
       - run: pnpm --filter @eshlox/hashglyph-web test:e2e
 
@@ -79,7 +79,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm -r --filter "./packages/*" build
+      - run: pnpm build:packages
       - run: pnpm brand:verify
 
   audit:
