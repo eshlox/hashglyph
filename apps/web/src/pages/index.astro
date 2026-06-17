@@ -1,6 +1,7 @@
 ---
 import { GRAMMARS, generateGlyph, HASHES, renderSvg } from '@eshlox/hashglyph-core';
 import Seo from '../components/Seo.astro';
+import { CONCEPTS, GRAMMAR_NOTES, HASH_NOTES } from '../lib/glossary';
 import { SITE, SITE_DESCRIPTION, SITE_TITLE, SOCIAL_LINKS } from '../lib/site';
 import '../styles/global.css';
 
@@ -19,6 +20,10 @@ const sampleRows = GRAMMARS.map((g) => {
   const glyph = generateGlyph({ seed: 'hashglyph', grammar: g.id });
   return { id: g.id, label: g.label, digest: glyph.digestHex.slice(0, 12) };
 });
+
+// Glossary rows, driven off the live registries so nothing drifts out of sync.
+const hashGlossary = HASHES.map((h) => ({ id: h.id, label: h.label, ...HASH_NOTES[h.id] }));
+const grammarGlossary = GRAMMARS.map((g) => ({ id: g.id, label: g.label, ...GRAMMAR_NOTES[g.id] }));
 ---
 
 <!doctype html>
@@ -36,6 +41,7 @@ const sampleRows = GRAMMARS.map((g) => {
         <a href="#studio">Generate</a>
         <a href="#how">How it works</a>
         <a href="#algorithms">Algorithms</a>
+        <a href="#glossary">Glossary</a>
         <a href="https://github.com/eshlox/hashglyph">GitHub</a>
       </nav>
     </header>
@@ -217,6 +223,47 @@ your-name
               ))}
             </tbody>
           </table>
+        </div>
+      </section>
+
+      <!-- ===================== GLOSSARY ===================== -->
+      <section id="glossary" class="block">
+        <div class="wrap">
+          <h2>Plain-English glossary</h2>
+          <p>
+            Every option in the studio, explained in one line — with a link to the source so you can
+            read more. None of it changes your mark: a fixed (hash, grammar) pair is frozen forever.
+          </p>
+
+          <h3 class="glossary-head">Hashes</h3>
+          <dl class="glossary">
+            {hashGlossary.map((h) => (
+              <div class="glossary-row">
+                <dt><code class="mono">{h.id}</code> {h.label}</dt>
+                <dd>{h.blurb} <a href={h.href} rel="noopener" target="_blank">{h.source} ↗</a></dd>
+              </div>
+            ))}
+          </dl>
+
+          <h3 class="glossary-head">Visual grammars</h3>
+          <dl class="glossary">
+            {grammarGlossary.map((g) => (
+              <div class="glossary-row">
+                <dt><code class="mono">{g.id}</code> {g.label}</dt>
+                <dd>{g.blurb} <a href={g.href} rel="noopener" target="_blank">{g.source} ↗</a></dd>
+              </div>
+            ))}
+          </dl>
+
+          <h3 class="glossary-head">Concepts under the hood</h3>
+          <dl class="glossary">
+            {CONCEPTS.map((c) => (
+              <div class="glossary-row">
+                <dt>{c.term}</dt>
+                <dd>{c.blurb} <a href={c.href} rel="noopener" target="_blank">{c.source} ↗</a></dd>
+              </div>
+            ))}
+          </dl>
         </div>
       </section>
     </main>

@@ -89,17 +89,19 @@ one mark, forever.
 
 ## Algorithms: hash × grammar
 
-It's pluggable on two axes: **6 hashes × 5 grammars = 30 combinations**. The
+It's pluggable on two axes: **17 hashes × 5 grammars = 85 combinations**. The
 default combo mints the canonical mark; the rest are yours to explore.
 
 | Hashes | Grammars |
 | --- | --- |
-| `blake3` (default), `sha256`, `sha512`, `sha3-256`, `sha3-512`, `keccak256` | `core-accents-v1` (canonical), `mirror-identicon-v1`, `symmetric-mask-v1`, `quad-fold-v1`, `cellular-automata-v1` |
+| `blake3` (default), `blake2b`, `blake2s`, `sha256`, `sha224`, `sha384`, `sha512`, `sha512-256`, `sha3-256`, `sha3-512`, `shake128`, `shake256`, `keccak256`, `keccak512`, `ripemd160`, `sha1`, `md5` | `core-accents-v1` (canonical), `mirror-identicon-v1`, `symmetric-mask-v1`, `quad-fold-v1`, `cellular-automata-v1` |
 
-Fixed-length hashes are expanded to the grammar's bit budget with a counter
-construction; BLAKE3 uses its native XOF (so its 64-byte digest is exactly the
-canonical one). Every grammar is mirror-symmetric, so output reads as a *mark*,
-not noise.
+Extendable-output functions (BLAKE3, SHAKE) fill the grammar's bit budget with
+their native XOF — BLAKE3's 64-byte digest is exactly the canonical one. Every
+other hash is expanded with an HKDF-style counter construction. `sha1`/`md5` are
+cryptographically broken and included only for recognizability — the glyph is a
+visual mark, not a security boundary. Every grammar is mirror-symmetric, so
+output reads as a *mark*, not noise.
 
 ## CLI reference
 

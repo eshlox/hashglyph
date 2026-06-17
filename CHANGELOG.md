@@ -5,6 +5,25 @@ All notable changes to HashGlyph are documented here. The project adheres to
 **stability policy**: a shipped `-vN` grammar never changes; new behaviour ships
 as a new versioned grammar.
 
+## [Unreleased]
+
+### Added
+
+- **More hashes (6 → 17)**: BLAKE2b, BLAKE2s, SHA-224, SHA-384, SHA-512/256,
+  SHAKE128, SHAKE256, Keccak-512, RIPEMD-160, SHA-1, and MD5 join the registry —
+  now **17 hashes × 5 grammars = 85 combinations**. SHAKE uses its native XOF
+  like BLAKE3; the rest use the existing counter expansion. SHA-1/MD5 are
+  cryptographically broken and included only for recognizability. Additive and
+  non-breaking: the canonical BLAKE3 mark is untouched.
+- **Website glossary**: a plain-English section explaining every hash, grammar,
+  and pipeline concept (normalization, domain separation, XOF, counter
+  expansion, bitstream, QR), each with a link to its authoritative source.
+
+### Fixed
+
+- **Website footer**: vertical padding was silently overridden by `.wrap`, so
+  the footer hugged the window edge and the border above it. Now spaced.
+
 ## [1.0.0] - 2026-06-17
 
 ### Added
