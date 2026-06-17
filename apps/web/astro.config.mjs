@@ -12,4 +12,10 @@ export default defineConfig({
     assets: 'assets',
   },
   devToolbar: { enabled: false },
+  vite: {
+    // Allow the dev/preview server to be reached via *.eshlox.net hostnames
+    // (e.g. localhost.eshlox.net). The leading dot also matches the apex.
+    server: { allowedHosts: ['.eshlox.net'] },
+    preview: { allowedHosts: ['.eshlox.net'] },
+  },
 });

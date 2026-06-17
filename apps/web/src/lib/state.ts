@@ -18,10 +18,20 @@ export interface GlyphState {
   transparent: boolean;
   rounded: boolean;
   padding: number;
+  /** Whether QR mode is enabled. */
+  qrMode: boolean;
+  /** The URL/text a generated QR code points to. */
+  qrUrl: string;
 }
 
 /** Hard cap on seed length accepted from the URL / input (defense-in-depth). */
 export const SEED_MAX_LENGTH = 64;
+
+/** Hard cap on the QR payload length (longer codes get hard to scan with a logo). */
+export const QR_URL_MAX_LENGTH = 512;
+
+/** Length beyond which scannability degrades with a centered glyph at ECC H. */
+export const QR_URL_WARN_LENGTH = 120;
 
 export const DEFAULT_STATE: GlyphState = {
   seed: 'hashglyph',
@@ -32,7 +42,22 @@ export const DEFAULT_STATE: GlyphState = {
   transparent: false,
   rounded: false,
   padding: 1,
+  qrMode: false,
+  qrUrl: 'https://hashglyph.eshlox.net',
 };
+
+/**
+ * Normalize a QR target: trim, cap length, and prepend `https://` when no URI
+ * scheme is present so a bare domain still resolves to a website when scanned.
+ * Empty input falls back to the default site.
+ */
+export function normalizeQrUrl(raw: string): string {
+  const trimmed = raw.trim().slice(0, QR_URL_MAX_LENGTH);
+  if (trimmed.length === 0) return DEFAULT_STATE.qrUrl;
+  // Already has a scheme (http:, https:, mailto:, tel:, etc.)? Keep as-is.
+  if (/^[a-z][a-z0-9+.-]*:/i.test(trimmed)) return trimmed;
+  return `https://${trimmed}`;
+}
 
 function clampPadding(value: string | null): number {
   if (value === null) return DEFAULT_STATE.padding;
@@ -59,6 +84,7 @@ export function parseState(search: string | URLSearchParams): GlyphState {
 
   const hashParam = params.get('hash');
   const grammarParam = params.get('grammar');
+  const qrUrlParam = params.get('qrurl');
 
   return {
     seed,
@@ -69,6 +95,9 @@ export function parseState(search: string | URLSearchParams): GlyphState {
     transparent: params.get('transparent') === '1',
     rounded: params.get('rounded') === '1',
     padding: clampPadding(params.get('padding')),
+    // QR mode turns on if explicitly flagged or a target URL was shared.
+    qrMode: params.get('qr') === '1' || qrUrlParam !== null,
+    qrUrl: qrUrlParam !== null ? normalizeQrUrl(qrUrlParam) : DEFAULT_STATE.qrUrl,
   };
 }
 
@@ -83,6 +112,10 @@ export function toQuery(state: GlyphState): string {
   if (state.transparent) params.set('transparent', '1');
   if (state.rounded) params.set('rounded', '1');
   if (state.padding !== DEFAULT_STATE.padding) params.set('padding', String(state.padding));
+  if (state.qrMode) {
+    if (state.qrUrl !== DEFAULT_STATE.qrUrl) params.set('qrurl', state.qrUrl);
+    else params.set('qr', '1');
+  }
   return params.toString();
 }
 

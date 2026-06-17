@@ -86,12 +86,25 @@ test.describe('HashGlyph site', () => {
     expect(bytes.subarray(0, 2)).toEqual(Buffer.from('PK')); // zip magic
   });
 
-  test('QR mode renders a QR and can be downloaded', async ({ page }) => {
+  test('QR mode points at a custom URL, shares it, and downloads', async ({ page }) => {
     await page.goto('/');
     await page.check('#qr-toggle');
     await expect(page.locator('#qr-preview svg')).toBeVisible();
+
+    // Point the QR at a custom site; it lands in the permalink.
+    await page.fill('#qr-url', 'https://example.com/me');
+    await expect(page).toHaveURL(/qrurl=/);
+    await expect(page.locator('#permalink')).toHaveValue(/example\.com/);
+
     const [download] = await Promise.all([page.waitForEvent('download'), page.click('#dl-qr')]);
     expect(download.suggestedFilename()).toMatch(/-qr\.png$/);
+  });
+
+  test('QR mode + target hydrate from a shared permalink', async ({ page }) => {
+    await page.goto('/?qrurl=https%3A%2F%2Fexample.org');
+    await expect(page.locator('#qr-toggle')).toBeChecked();
+    await expect(page.locator('#qr-url')).toHaveValue('https://example.org');
+    await expect(page.locator('#qr-preview svg')).toBeVisible();
   });
 
   test('color and transparency changes are reflected in the SVG', async ({ page }) => {
