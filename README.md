@@ -127,7 +127,8 @@ brand/          frozen, reproducible brand assets
 
 ```bash
 pnpm install
-pnpm -r build        # build core + cli (TS project references)
+pnpm build:packages  # build core + cli (TS project references)
+pnpm build           # build the deployable site → ./dist
 pnpm test            # vitest: 180+ unit/property/security tests
 pnpm typecheck       # tsc --build
 pnpm check           # biome lint + format
@@ -164,15 +165,17 @@ pnpm, so you don't override the install command.
 | Setting | Value |
 | --- | --- |
 | Framework preset | Astro (or None) |
-| Build command | `pnpm build:web` |
-| Build output directory | `apps/web/dist` |
+| Build command | `pnpm build` |
+| Build output directory | `dist` |
 | Install command | `pnpm install` (auto) |
 | Root directory | `/` |
 
-Because this is a monorepo, the build command is `pnpm build:web`, which builds
-`@eshlox/hashglyph-core` first and then the Astro app (the site imports the core
-engine). The output lands in `apps/web/dist`. Point your custom domain
-`hashglyph.eshlox.net` at the Pages project and you're done.
+`pnpm build` compiles `@eshlox/hashglyph-core` first and then the Astro app (the
+site imports the core engine). Even though this is a monorepo, Astro is
+configured (`outDir: '../../dist'`) to emit to the repo-root `dist/`, so
+Cloudflare's default output directory finds it with no extra dashboard config.
+Point your custom domain `hashglyph.eshlox.net` at the Pages project and you're
+done.
 
 ## Stability policy
 
