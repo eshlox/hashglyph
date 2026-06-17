@@ -13,7 +13,7 @@ import type { GlyphGrammar } from './types.js';
 export const cellularAutomataV1: GlyphGrammar = {
   id: 'cellular-automata-v1',
   label: 'Cellular Automata',
-  description: 'Rule-90 automaton grown from a hashed seed row — the nerdy one.',
+  description: 'Rule-90 automaton grown from a hashed seed row, the nerdy one.',
   materialId: 'hashglyph-cellular-automata-v1',
   byteBudget: 1, // 5 seed bits (mirrored)
   build({ bits }) {

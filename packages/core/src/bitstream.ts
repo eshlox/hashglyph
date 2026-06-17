@@ -2,7 +2,7 @@
  * A most-significant-bit-first reader over a byte array.
  *
  * Bit order is part of the determinism contract: bit 0 is the high bit (`0x80`)
- * of byte 0. Never change this — it would silently alter every glyph.
+ * of byte 0. Never change this, it would silently alter every glyph.
  */
 export class BitStream {
   readonly #bytes: Uint8Array;

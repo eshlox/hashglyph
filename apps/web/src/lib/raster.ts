@@ -8,7 +8,7 @@ function asBuffer(bytes: Uint8Array): ArrayBuffer {
 /**
  * Load an SVG string as an HTMLImageElement. Using an `<img>` + object URL is
  * the most cross-browser way to rasterize SVG (Safari's `createImageBitmap`
- * support for SVG is patchy). The SVG must carry intrinsic width/height — ours
+ * support for SVG is patchy). The SVG must carry intrinsic width/height, ours
  * does. Self-contained SVG ⇒ the canvas is never tainted.
  */
 function loadSvgImage(svg: string): Promise<HTMLImageElement> {

@@ -89,7 +89,7 @@ export function renderSvg(glyph: Glyph, options: SvgOptions = {}): string {
   const modules = gridSize + padding * 2;
   const size = modules * scale;
 
-  const title = escapeXml(options.title ?? `HashGlyph — ${glyph.seed}`);
+  const title = escapeXml(options.title ?? `HashGlyph glyph for "${glyph.seed}"`);
   const label = escapeXml(options.label ?? `Deterministic pixel glyph for "${glyph.seed}"`);
 
   const background =

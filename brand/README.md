@@ -1,8 +1,8 @@
 # HashGlyph brand assets
 
-These files are HashGlyph's **own** frozen brand assets — the glyph for the seed
+These files are HashGlyph's **own** frozen brand assets: the glyph for the seed
 `hashglyph`, minted by `pnpm brand:generate` with the very same engine everyone
-uses. They are byte-reproducible: CI regenerates them and fails if anything
+uses. They are byte-reproducible. CI regenerates them and fails if anything
 drifts (`pnpm brand:verify`).
 
 ```
@@ -36,5 +36,5 @@ pnpm brand:verify      # regenerate and assert no git diff
 HashGlyph's own mark (like every glyph) must never change. The algorithm is
 pinned by the material string `hashglyph-core-accents-v1|hashglyph` and the
 BLAKE3 hash. To evolve the visual system, add a **new** versioned grammar (e.g.
-`core-accents-v2`) — never edit a shipped `-v1`. See the root `README.md` and
+`core-accents-v2`) and never edit a shipped `-v1`. See the root `README.md` and
 `CONTRIBUTING.md`.

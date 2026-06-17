@@ -56,7 +56,7 @@ function collect(value: string, previous: number[]): number[] {
   return [...previous, n];
 }
 
-/** Build the configured CLI program. Pure wiring — all logic lives in commands. */
+/** Build the configured CLI program. Pure wiring, all logic lives in commands. */
 export function buildProgram(opts: BuildOptions): Command {
   const { io } = opts;
   const write = opts.write ?? writeArtifacts;

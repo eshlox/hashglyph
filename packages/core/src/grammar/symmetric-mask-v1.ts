@@ -17,7 +17,7 @@ function inMask(x: number, y: number): boolean {
 export const symmetricMaskV1: GlyphGrammar = {
   id: 'symmetric-mask-v1',
   label: 'Symmetric Mask',
-  description: 'Hash bits gated by a diamond mask — always a clean badge silhouette.',
+  description: 'Hash bits gated by a diamond mask, always a clean badge silhouette.',
   materialId: 'hashglyph-symmetric-mask-v1',
   byteBudget: 4, // <= 25 masked cells in the left half
   build({ bits }) {

@@ -43,7 +43,7 @@ function fire(id: string, type = 'input'): void {
   document.getElementById(id)?.dispatchEvent(new window.Event(type, { bubbles: true }));
 }
 
-describe('initGenerator (jsdom — core runs against the DOM)', () => {
+describe('initGenerator (jsdom: core runs against the DOM)', () => {
   beforeEach(() => buildDom());
 
   it('renders the canonical mark on load', () => {
@@ -89,7 +89,7 @@ describe('initGenerator (jsdom — core runs against the DOM)', () => {
     expect(document.getElementById('seed-error')?.hidden).toBe(false);
     // Stale glyph is cleared, not left pointing at the previous one.
     expect(document.getElementById('preview')?.innerHTML).toBe('');
-    expect(document.getElementById('digest')?.textContent).toBe('—');
+    expect(document.getElementById('digest')?.textContent).toBe('…');
   });
 
   it('enables QR mode, renders a code, and puts the target in the permalink', () => {

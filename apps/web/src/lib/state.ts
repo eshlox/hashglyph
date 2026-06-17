@@ -8,7 +8,7 @@ import {
   isSafeColor,
 } from '@eshlox/hashglyph-core';
 
-/** The full, validated UI state — also the shape encoded in the permalink. */
+/** The full, validated UI state, also the shape encoded in the permalink. */
 export interface GlyphState {
   seed: string;
   hash: HashId;
@@ -73,7 +73,7 @@ function safeColor(value: string | null, fallback: string): string {
 
 /**
  * Parse UI state from URL search params. Every field is validated and falls
- * back to a safe default on bad input — this never throws, so a hand-edited or
+ * back to a safe default on bad input, this never throws, so a hand-edited or
  * malicious URL can only ever produce a valid, canonical-ish glyph.
  */
 export function parseState(search: string | URLSearchParams): GlyphState {

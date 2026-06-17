@@ -46,7 +46,7 @@ const sampleRows = GRAMMARS.map((g) => {
         <h1>A name in. <span class="grad">A glyph out.</span><br />Always the same one.</h1>
         <p class="lead">
           HashGlyph hashes a word into a constrained pixel grammar to mint a compact digital
-          signature — part monogram, part favicon, part terminal-era artifact. Same seed, same mark,
+          signature: part monogram, part favicon, part terminal-era artifact. Same seed, same mark,
           forever.
         </p>
         <div class="slogans">
@@ -67,7 +67,7 @@ const sampleRows = GRAMMARS.map((g) => {
               <label for="seed">Seed</label>
               <input id="seed" type="text" autocomplete="off" spellcheck="false" maxlength="64"
                 placeholder="type any word…" />
-              <p id="seed-error" class="error" hidden>Seed is empty after normalization — try real characters.</p>
+              <p id="seed-error" class="error" hidden>Seed is empty after normalization. Try real characters.</p>
             </div>
 
             <div class="row">
@@ -105,7 +105,7 @@ const sampleRows = GRAMMARS.map((g) => {
               <label class="toggle"><input id="transparent" type="checkbox" /> Transparent</label>
               <label class="toggle"><input id="qr-toggle" type="checkbox" /> QR mode</label>
             </div>
-            <p id="contrast-warning" class="warn" hidden>⚠ Low contrast — this may be hard to read at favicon sizes.</p>
+            <p id="contrast-warning" class="warn" hidden>⚠ Low contrast. This may be hard to read at favicon sizes.</p>
 
             <div class="btns">
               <button id="randomize" class="btn" type="button">🎲 Surprise me</button>
@@ -154,7 +154,7 @@ const sampleRows = GRAMMARS.map((g) => {
                 <label for="qr-url">QR points to</label>
                 <input id="qr-url" type="text" inputmode="url" autocomplete="off"
                   spellcheck="false" maxlength="512" placeholder="https://your-site.com" />
-                <p id="qr-warning" class="warn" hidden>⚠ Long link — the code gets dense and may be harder to scan with the centered glyph.</p>
+                <p id="qr-warning" class="warn" hidden>⚠ Long link. The code gets dense and may be harder to scan with the centered glyph.</p>
               </div>
               <div id="qr-preview" class="qr-preview"></div>
               <div class="btns" style="justify-content:center">
@@ -191,7 +191,7 @@ your-name
   ↓ <b>render</b>             SVG · PNG · ICO · QR</div>
 
           <div class="features">
-            <div class="feature"><span class="ic">// deterministic</span><h3>Same in, same out</h3><p>One seed maps to exactly one mark — forever. No timestamps, no randomness.</p></div>
+            <div class="feature"><span class="ic">// deterministic</span><h3>Same in, same out</h3><p>One seed maps to exactly one mark, forever. No timestamps, no randomness.</p></div>
             <div class="feature"><span class="ic">// designed</span><h3>Not an identicon</h3><p>A fixed brand core makes it read as a logo; the hash only paints the accents.</p></div>
             <div class="feature"><span class="ic">// portable</span><h3>Everywhere</h3><p>Crisp from 16px favicons to wall-sized SVG. Generation runs entirely in your browser.</p></div>
             <div class="feature"><span class="ic">// frozen</span><h3>Versioned forever</h3><p>Grammars are pinned with a version suffix. Your logo never changes under you.</p></div>

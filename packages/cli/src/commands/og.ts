@@ -11,7 +11,7 @@ export interface OgInput {
   og: OgOptions;
 }
 
-/** `og` — render a 1200×630 Open Graph card PNG (and its source SVG). */
+/** `og`: render a 1200×630 Open Graph card PNG (and its source SVG). */
 export async function runOg(input: OgInput): Promise<CommandResult> {
   const glyph = generateGlyph({
     seed: input.seed,
