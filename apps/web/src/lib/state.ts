@@ -24,7 +24,7 @@ export interface GlyphState {
 export const SEED_MAX_LENGTH = 64;
 
 export const DEFAULT_STATE: GlyphState = {
-  seed: 'eshlox',
+  seed: 'hashglyph',
   hash: DEFAULT_HASH,
   grammar: DEFAULT_GRAMMAR,
   fg: '#0b0e14',

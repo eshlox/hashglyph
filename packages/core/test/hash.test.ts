@@ -45,10 +45,10 @@ describe('hash registry', () => {
 
     it('blake3 reproduces the canonical 64-byte digest', () => {
       const blake = getHash('blake3');
-      const hex = Buffer.from(blake.expand('eshlox-deterministic-glyph-v1|eshlox', 64)).toString(
+      const hex = Buffer.from(blake.expand('hashglyph-core-accents-v1|hashglyph', 64)).toString(
         'hex',
       );
-      expect(hex.startsWith('4b343318ccb00312')).toBe(true);
+      expect(hex.startsWith('bfd24b02875f3d34')).toBe(true);
     });
   });
 });

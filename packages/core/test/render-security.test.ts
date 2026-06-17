@@ -49,7 +49,7 @@ describe('SVG renderer is XSS-safe', () => {
   });
 
   it('produces output with no external references or scripting surfaces', () => {
-    const svg = renderSvg(generateGlyph({ seed: 'eshlox' }));
+    const svg = renderSvg(generateGlyph({ seed: 'hashglyph' }));
     // Strip the (legitimate, required) SVG namespace declaration first.
     const body = svg.replace('xmlns="http://www.w3.org/2000/svg"', '');
     expect(svg).not.toMatch(/<script/i);
@@ -88,7 +88,7 @@ describe('color validation', () => {
   });
 
   it('renderSvg throws on an unsafe color', () => {
-    const glyph = generateGlyph({ seed: 'eshlox' });
+    const glyph = generateGlyph({ seed: 'hashglyph' });
     expect(() => renderSvg(glyph, { fg: '"><script>' })).toThrow(InvalidRenderOptionError);
     expect(() => renderSvg(glyph, { bg: 'url(#x)' })).toThrow(InvalidRenderOptionError);
   });

@@ -1,11 +1,11 @@
 {
-  "seed": "eshlox",
-  "normalized": "eshlox",
+  "seed": "hashglyph",
+  "normalized": "hashglyph",
   "hashId": "blake3",
   "grammarId": "core-accents-v1",
-  "materialId": "eshlox-deterministic-glyph-v1",
-  "material": "eshlox-deterministic-glyph-v1|eshlox",
-  "digestHex": "4b343318ccb00312918f026859a895c7cba8de501c4dd05281e9244998b160c0efd87842589ba89f98f772030b83780a247e4528c738ecdfa837cc705d600440",
+  "materialId": "hashglyph-core-accents-v1",
+  "material": "hashglyph-core-accents-v1|hashglyph",
+  "digestHex": "bfd24b02875f3d34cd6e99511319eb8c3933bd54563973a40dfec2c8833e27adb89223357563a55c58265c4be59815fa7906acc5f11d7db61607fbf2f2ee0010",
   "grid": [
     [
       0,
@@ -55,7 +55,7 @@
       0,
       1,
       1,
-      0,
+      1,
       1,
       1,
       1,
@@ -111,22 +111,22 @@
     {
       "x": 4,
       "y": 1,
-      "enabled": false
+      "enabled": true
     },
     {
       "x": 1,
       "y": 4,
-      "enabled": true
+      "enabled": false
     },
     {
       "x": 7,
       "y": 4,
-      "enabled": false
+      "enabled": true
     },
     {
       "x": 4,
       "y": 7,
-      "enabled": false
+      "enabled": true
     },
     {
       "x": 4,
@@ -136,7 +136,7 @@
     {
       "x": 3,
       "y": 4,
-      "enabled": false
+      "enabled": true
     },
     {
       "x": 5,

@@ -3,11 +3,11 @@ import { EmptySeedError, normalizeSeed, tryNormalizeSeed } from '../src/index.js
 
 describe('normalizeSeed', () => {
   it.each([
-    ['eshlox', 'eshlox'],
-    ['Eshlox', 'eshlox'],
-    ['ESHLOX', 'eshlox'],
-    [' eshlox ', 'eshlox'],
-    ['\t Eshlox \n', 'eshlox'],
+    ['hashglyph', 'hashglyph'],
+    ['HashGlyph', 'hashglyph'],
+    ['HASHGLYPH', 'hashglyph'],
+    [' hashglyph ', 'hashglyph'],
+    ['\t HashGlyph \n', 'hashglyph'],
     ['CAFÉ', 'café'],
   ])('normalizes %j → %j', (input, expected) => {
     expect(normalizeSeed(input)).toBe(expected);
@@ -36,7 +36,7 @@ describe('normalizeSeed', () => {
 
 describe('tryNormalizeSeed', () => {
   it('returns the normalized seed for valid input', () => {
-    expect(tryNormalizeSeed(' Eshlox ')).toBe('eshlox');
+    expect(tryNormalizeSeed(' HashGlyph ')).toBe('hashglyph');
   });
 
   it('returns null instead of throwing for empty input', () => {

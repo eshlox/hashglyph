@@ -51,7 +51,7 @@ describe('toQuery', () => {
 
 describe('slugify', () => {
   it.each([
-    ['Eshlox', 'eshlox'],
+    ['HashGlyph', 'hashglyph'],
     ['../../etc', 'etc'],
     ['🚀', 'glyph'],
     ['Café Net', 'cafe-net'],

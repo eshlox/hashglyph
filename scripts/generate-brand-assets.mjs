@@ -26,8 +26,8 @@ const BRAND = join(ROOT, 'brand/assets');
 const PUBLIC = join(ROOT, 'apps/web/public');
 const FAVICONS = join(PUBLIC, 'favicons');
 
-const SEED = 'eshlox';
-const BASE = 'eshlox-deterministic-glyph';
+const SEED = 'hashglyph';
+const BASE = 'hashglyph-deterministic-glyph';
 const SITE = 'https://hashglyph.eshlox.net';
 
 /** Write the same bytes/text to one or more destination paths. */
@@ -65,8 +65,8 @@ function webmanifest() {
       name: 'HashGlyph',
       short_name: 'HashGlyph',
       icons: [
-        { src: '/favicons/eshlox-192.png', sizes: '192x192', type: 'image/png' },
-        { src: '/favicons/eshlox-512.png', sizes: '512x512', type: 'image/png' },
+        { src: '/favicons/hashglyph-192.png', sizes: '192x192', type: 'image/png' },
+        { src: '/favicons/hashglyph-512.png', sizes: '512x512', type: 'image/png' },
       ],
       theme_color: '#0b0e14',
       background_color: '#ffffff',

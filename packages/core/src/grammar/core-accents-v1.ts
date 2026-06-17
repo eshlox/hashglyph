@@ -2,14 +2,15 @@ import { emptyGrid, setCell } from '../grid.js';
 import type { AccentDecision, GlyphGrammar, Point } from './types.js';
 
 /**
- * The canonical Eshlox grammar.
+ * The canonical HashGlyph grammar.
  *
  * A fixed square shell plus an internal X / portal motif give the mark its
  * stable identity; eight hash-driven accent pixels add the "generated digital
  * signature" feel without ever destroying the core shape.
  *
- * FROZEN. This combined with BLAKE3 over `eshlox-deterministic-glyph-v1|eshlox`
- * reproduces the official logo, byte for byte, forever.
+ * FROZEN. This is the default grammar for every seed. Combined with BLAKE3 over
+ * `hashglyph-core-accents-v1|hashglyph` it reproduces the project's own logo,
+ * byte for byte, forever.
  */
 
 /** Fixed inner motif: portal / compressed-letter structure. */
@@ -42,8 +43,8 @@ const ACCENTS: readonly Point[] = [
 export const coreAccentsV1: GlyphGrammar = {
   id: 'core-accents-v1',
   label: 'Core + Accents',
-  description: 'The canonical Eshlox mark: a fixed shell + portal motif with hashed accents.',
-  materialId: 'eshlox-deterministic-glyph-v1',
+  description: 'The canonical mark: a fixed shell + portal motif with hashed accents.',
+  materialId: 'hashglyph-core-accents-v1',
   byteBudget: 1,
   build({ bits }) {
     const grid = emptyGrid();

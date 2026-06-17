@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { expect, test } from '@playwright/test';
 
-const CANONICAL_DIGEST_PREFIX = '4b343318';
+const CANONICAL_DIGEST_PREFIX = 'bfd24b02';
 
 test.describe('HashGlyph site', () => {
   test('renders SEO metadata and JSON-LD', async ({ page }) => {
@@ -15,22 +15,20 @@ test.describe('HashGlyph site', () => {
     expect(jsonLd).toContain('SoftwareApplication');
   });
 
-  test('shows the canonical eshlox glyph on first load (core runs in-browser)', async ({
-    page,
-  }) => {
+  test('shows the canonical mark on first load (core runs in-browser)', async ({ page }) => {
     await page.goto('/');
     await expect(page.locator('#preview svg')).toBeVisible();
     await expect(page.locator('#digest')).toHaveText(new RegExp(`^${CANONICAL_DIGEST_PREFIX}`));
-    await expect(page.locator('#material')).toHaveText('eshlox-deterministic-glyph-v1|eshlox');
+    await expect(page.locator('#material')).toHaveText('hashglyph-core-accents-v1|hashglyph');
   });
 
   test('typing a seed updates the glyph and the permalink', async ({ page }) => {
     await page.goto('/');
     const before = await page.locator('#digest').textContent();
-    await page.fill('#seed', 'vertolabs');
+    await page.fill('#seed', 'ada');
     await expect(page.locator('#digest')).not.toHaveText(before ?? '');
-    await expect(page).toHaveURL(/seed=vertolabs/);
-    await expect(page.locator('#permalink')).toHaveValue(/seed=vertolabs/);
+    await expect(page).toHaveURL(/seed=ada/);
+    await expect(page.locator('#permalink')).toHaveValue(/seed=ada/);
   });
 
   test('permalink round-trips state from the URL', async ({ page }) => {

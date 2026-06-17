@@ -216,16 +216,16 @@ export function initGenerator(): void {
   });
   el<HTMLButtonElement>('randomize').addEventListener('click', () => {
     const words = [
-      'eshlox',
-      'vertolabs',
-      'portal',
+      'hashglyph',
       'nebula',
       'cipher',
       'quanta',
       'zenith',
       'orbit',
+      'vertex',
+      'photon',
     ];
-    state.seed = words[Math.floor(Math.random() * words.length)] ?? 'eshlox';
+    state.seed = words[Math.floor(Math.random() * words.length)] ?? 'hashglyph';
     controls.seed.value = state.seed;
     render();
   });

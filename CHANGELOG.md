@@ -20,11 +20,14 @@ as a new versioned grammar.
 - **Website** — Astro static single-page app for hashglyph.eshlox.net: live
   preview, colour/pixel controls, hash × grammar picker, shareable permalinks,
   SVG/PNG/ICO/ZIP/QR downloads, full SEO + JSON-LD.
-- **Brand** — frozen, byte-reproducible logo, favicons, and OG image for the
-  canonical `eshlox` seed, verified in CI.
+- **Brand** — frozen, byte-reproducible logo, favicons, and OG image generated
+  from HashGlyph's own seed (`hashglyph`), verified in CI.
 
 ### Canonical mark (frozen)
 
+HashGlyph's own logo is the glyph for the seed `hashglyph` (the same engine
+everyone uses):
+
 ```
-blake3( eshlox-deterministic-glyph-v1 | eshlox ) = 4b343318ccb00312…d600440
+blake3( hashglyph-core-accents-v1 | hashglyph ) = bfd24b02875f3d34…f2ee0010
 ```

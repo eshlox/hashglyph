@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { generateGlyph, renderSvg } from '../src/index.js';
 
-const glyph = generateGlyph({ seed: 'eshlox' });
+const glyph = generateGlyph({ seed: 'hashglyph' });
 
 describe('renderSvg options', () => {
   it('defaults to black-on-white square pixels with crisp edges', () => {

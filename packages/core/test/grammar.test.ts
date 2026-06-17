@@ -32,9 +32,9 @@ describe('grammar registry', () => {
     expect(() => getGrammar('nope')).toThrow(UnknownAlgorithmError);
   });
 
-  it('every grammar produces a non-empty glyph for the eshlox seed', () => {
+  it('every grammar produces a non-empty glyph for the hashglyph seed', () => {
     for (const id of GRAMMAR_IDS) {
-      const glyph = generateGlyph({ seed: 'eshlox', grammar: id });
+      const glyph = generateGlyph({ seed: 'hashglyph', grammar: id });
       expect(countOn(glyph.grid)).toBeGreaterThan(0);
     }
   });
@@ -60,7 +60,7 @@ describe('grammar registry', () => {
 
   it('core-accents always keeps the fixed shell (corners of the inner square)', () => {
     // The shell pixel at (1,1) is fixed regardless of accents/seed/hash.
-    for (const seed of ['eshlox', 'a', 'something-else', '🚀']) {
+    for (const seed of ['hashglyph', 'a', 'something-else', '🚀']) {
       const { grid } = generateGlyph({ seed, grammar: 'core-accents-v1' });
       expect(grid[1]?.[1]).toBe(1);
       expect(grid[7]?.[7]).toBe(1);

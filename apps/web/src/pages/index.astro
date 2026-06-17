@@ -10,14 +10,14 @@ const DESCRIPTION =
 
 const stripProlog = (svg: string) => svg.replace(/^<\?xml[^>]*\?>\s*/, '');
 
-// The brand mark IS the canonical eshlox glyph, computed at build time.
+// The brand mark IS HashGlyph's own glyph (seed "hashglyph"), built at build time.
 const brandMark = stripProlog(
-  renderSvg(generateGlyph({ seed: 'eshlox' }), { padding: 1, scale: 10 }),
+  renderSvg(generateGlyph({ seed: 'hashglyph' }), { padding: 1, scale: 10 }),
 );
 
-// Sample marks for the matrix reference table.
+// Sample marks for the matrix reference table (the project's own seed).
 const sampleRows = GRAMMARS.map((g) => {
-  const glyph = generateGlyph({ seed: 'eshlox', grammar: g.id });
+  const glyph = generateGlyph({ seed: 'hashglyph', grammar: g.id });
   return { id: g.id, label: g.label, digest: glyph.digestHex.slice(0, 12) };
 });
 ---
@@ -176,11 +176,11 @@ const sampleRows = GRAMMARS.map((g) => {
             fixed brand core keeps the mark recognizable; the hash only drives a few accents. The
             output is pure, deterministic, and reproducible anywhere.
           </p>
-          <div class="pipeline">eshlox
+          <div class="pipeline">your-name
   ↓ <b>normalize</b>            NFKC · trim · lowercase
-eshlox
-  ↓ <b>domain separation</b>   core-accents-v1|eshlox
-  ↓ <b>BLAKE3</b>              4b343318ccb00312…
+your-name
+  ↓ <b>domain separation</b>   core-accents-v1|your-name
+  ↓ <b>BLAKE3</b>              hash bits…
   ↓ <b>bitstream</b>           MSB-first → grammar
 9×9 glyph
   ↓ <b>render</b>             SVG · PNG · ICO · QR</div>
@@ -201,11 +201,11 @@ eshlox
           <p>
             HashGlyph is pluggable on two axes: <strong>{HASHES.length} hash functions</strong> ×
             <strong>{GRAMMARS.length} visual grammars</strong> = {HASHES.length * GRAMMARS.length}
-            combinations. BLAKE3 + Core&nbsp;+&nbsp;Accents is the canonical default that mints the
-            official mark; the rest are yours to explore.
+            combinations. BLAKE3 + Core&nbsp;+&nbsp;Accents is the default that mints each mark;
+            the rest are yours to explore.
           </p>
           <table class="matrix-table">
-            <thead><tr><th>Grammar</th><th>Style</th><th>blake3(eshlox)</th></tr></thead>
+            <thead><tr><th>Grammar</th><th>Style</th><th>blake3(hashglyph)</th></tr></thead>
             <tbody>
               {sampleRows.map((r) => (
                 <tr><td>{r.label}</td><td class="mono">{r.id}</td><td class="mono">{r.digest}…</td></tr>
@@ -217,8 +217,8 @@ eshlox
     </main>
 
     <footer class="wrap">
-      <span>HashGlyph · a deterministic pixel-glyph system for <a href="https://eshlox.net">eshlox.net</a></span>
-      <span class="mono">blake3(core-accents-v1|eshlox) = 4b343318…</span>
+      <span>HashGlyph · a deterministic pixel-glyph generator for everyone · made by <a href="https://eshlox.net">eshlox</a></span>
+      <span class="mono">a name → a glyph, forever</span>
     </footer>
 
     <script>

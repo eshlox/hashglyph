@@ -5,8 +5,8 @@ describe('determinism across every (hash × grammar) combo', () => {
   for (const hash of HASH_IDS) {
     for (const grammar of GRAMMAR_IDS) {
       it(`${hash} × ${grammar} is stable and well-formed`, () => {
-        const a = generateGlyph({ seed: 'eshlox', hash, grammar });
-        const b = generateGlyph({ seed: 'eshlox', hash, grammar });
+        const a = generateGlyph({ seed: 'hashglyph', hash, grammar });
+        const b = generateGlyph({ seed: 'hashglyph', hash, grammar });
 
         // Same input → identical output.
         expect(gridToAscii(b.grid)).toBe(gridToAscii(a.grid));
@@ -28,8 +28,8 @@ describe('determinism across every (hash × grammar) combo', () => {
   }
 
   it('different hashes diverge for non-canonical material but share the grammar core', () => {
-    const blake = generateGlyph({ seed: 'eshlox', hash: 'blake3' });
-    const sha = generateGlyph({ seed: 'eshlox', hash: 'sha256' });
+    const blake = generateGlyph({ seed: 'hashglyph', hash: 'blake3' });
+    const sha = generateGlyph({ seed: 'hashglyph', hash: 'sha256' });
     // Same grammar id and material id (hash name is not part of the material).
     expect(sha.materialId).toBe(blake.materialId);
     // ...but a different hash yields a different digest.
@@ -40,7 +40,7 @@ describe('determinism across every (hash × grammar) combo', () => {
     const table: Record<string, string> = {};
     for (const hash of HASH_IDS) {
       for (const grammar of GRAMMAR_IDS) {
-        const g = generateGlyph({ seed: 'eshlox', hash, grammar });
+        const g = generateGlyph({ seed: 'hashglyph', hash, grammar });
         table[`${hash}|${grammar}`] =
           `${g.digestHex.slice(0, 16)} ${gridToAscii(g.grid).replace(/\n/g, '/')}`;
       }
