@@ -1,0 +1,52 @@
+{
+  "name": "@eshlox/hashglyph-cli",
+  "version": "1.0.0",
+  "description": "Command-line generator for HashGlyph deterministic pixel logos: SVG, PNG, favicons, OG images, and QR codes.",
+  "license": "MIT",
+  "author": "eshlox <eshlox@vertolabs.com>",
+  "homepage": "https://hashglyph.eshlox.net",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eshlox/hashglyph.git",
+    "directory": "packages/cli"
+  },
+  "keywords": [
+    "logo",
+    "favicon",
+    "cli",
+    "blake3",
+    "svg",
+    "generator",
+    "identicon"
+  ],
+  "type": "module",
+  "bin": {
+    "hashglyph": "./dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "clean": "rm -rf dist *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@eshlox/hashglyph-core": "workspace:*",
+    "commander": "15.0.0",
+    "picocolors": "1.1.1",
+    "sharp": "0.35.1"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}
