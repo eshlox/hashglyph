@@ -104,9 +104,10 @@ export function initGenerator(): void {
 
   /**
    * Whether to warn about legibility. Mono compares ink vs background. Color-8
-   * only lets the user change the background, so warn only when even the
-   * best-contrasting palette color is washed out against it (not when any single
-   * hue clashes — a 15-color mosaic always has some).
+   * only lets the user change the background, so we judge the palette as a whole:
+   * warn when the *median* palette color is washed out against the background
+   * (i.e. most of the mosaic is hard to see), not when any single hue clashes (a
+   * 15-color mosaic always has some).
    */
   function lowContrast(glyph: Glyph): boolean {
     if (state.transparent) return false;
@@ -117,8 +118,11 @@ export function initGenerator(): void {
     const ratios = glyph.palette
       .filter((color): color is string => color !== null)
       .map((color) => contrastRatio(color, state.bg))
-      .filter((ratio): ratio is number => ratio !== null);
-    return ratios.length > 0 && Math.max(...ratios) < MIN_CONTRAST;
+      .filter((ratio): ratio is number => ratio !== null)
+      .sort((a, b) => a - b);
+    if (ratios.length === 0) return false;
+    const median = ratios[ratios.length >> 1] ?? 0;
+    return median < MIN_CONTRAST;
   }
 
   function render(): void {

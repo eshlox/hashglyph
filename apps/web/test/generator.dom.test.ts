@@ -73,6 +73,20 @@ describe('initGenerator (jsdom: core runs against the DOM)', () => {
     expect(document.getElementById('fg-field')?.hidden).toBe(true);
   });
 
+  it('warns when a color-style background washes out most of the palette', () => {
+    buildDom('?style=color-8');
+    initGenerator();
+    const bg = document.getElementById('bg') as HTMLInputElement;
+    // White keeps most vivid hues readable: no warning.
+    bg.value = '#ffffff';
+    fire('bg');
+    expect(document.getElementById('contrast-warning')?.hidden).toBe(true);
+    // A mid gray sits inside the palette's luminance range: median contrast is low.
+    bg.value = '#959595';
+    fire('bg');
+    expect(document.getElementById('contrast-warning')?.hidden).toBe(false);
+  });
+
   it('verifies a matching name and rejects a different one', () => {
     initGenerator();
     const probe = document.getElementById('verify-seed') as HTMLInputElement;
