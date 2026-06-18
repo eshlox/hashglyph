@@ -73,6 +73,19 @@ describe('initGenerator (jsdom: core runs against the DOM)', () => {
     expect(document.getElementById('verify-result')?.dataset.state).toBe('bad');
   });
 
+  it('clears the stale verify result when the seed becomes invalid', () => {
+    initGenerator();
+    (document.getElementById('verify-seed') as HTMLInputElement).value = 'HashGlyph';
+    fire('verify-seed');
+    expect(document.getElementById('verify-result')?.dataset.state).toBe('ok');
+    // Now make the main seed invalid: the stale "matches" result must clear.
+    const seed = document.getElementById('seed') as HTMLInputElement;
+    seed.value = '   ';
+    fire('seed');
+    expect(document.getElementById('verify-result')?.textContent).toBe('');
+    expect(document.getElementById('verify-result')?.dataset.state).toBe('');
+  });
+
   it('updates the glyph and permalink when the seed changes', () => {
     initGenerator();
     const before = document.getElementById('digest')?.textContent;

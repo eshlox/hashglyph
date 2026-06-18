@@ -1,6 +1,6 @@
 # HashGlyph
 
-**A name in. A glyph out. Always the same one, and never the same as anyone else's.**
+**A name in. A glyph out. Always the same one, and (with a strong hash) practically never anyone else's.**
 
 HashGlyph turns any word into a deterministic, pixel-based logo. The seed is
 normalized, hashed to a full **256-bit digest**, and every bit of that digest is
@@ -108,8 +108,8 @@ are **17 hashes** rendered in **2 styles**.
 
 Both styles encode exactly 256 bits, so a glyph is a complete picture of its
 digest. Extendable-output functions (BLAKE3, SHAKE) emit those 256 bits natively;
-fixed-length hashes are stretched with an HKDF-style counter construction, which
-never adds entropy beyond the hash's native width. `sha1`/`md5` are
+fixed-length hashes are stretched with a counter-mode construction
+(`H(prk ‖ counter)`), which never adds entropy beyond the hash's native width. `sha1`/`md5` are
 cryptographically broken: collisions can be constructed on purpose, so they
 cannot honor the "no two names collide" guarantee and are included for fun only.
 

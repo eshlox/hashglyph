@@ -41,4 +41,18 @@ describe('decode / verify round-trip', () => {
     // An 8×8 grid cannot be a mono-16 glyph.
     expect(verifyGlyph(color.grid, 'mono-16', 'acme', 'blake3')).toBe(false);
   });
+
+  it('verify is strict: rejects out-of-range cells that share the same low bits', () => {
+    const glyph = generateGlyph({ seed: 'acme', style: 'color-8' });
+    const tampered = glyph.grid.map((row) => row.map((c) => c + 16)); // same low 4 bits
+    expect(verifyGlyph(tampered, 'color-8', 'acme', 'blake3')).toBe(false);
+  });
+
+  it('verify is strict: rejects extra columns/rows', () => {
+    const glyph = generateGlyph({ seed: 'acme', style: 'mono-16' });
+    const wideRows = glyph.grid.map((row) => [...row, 0]); // one extra column
+    expect(verifyGlyph(wideRows, 'mono-16', 'acme', 'blake3')).toBe(false);
+    const tallGrid = [...glyph.grid.map((r) => [...r]), new Array(16).fill(0)];
+    expect(verifyGlyph(tallGrid, 'mono-16', 'acme', 'blake3')).toBe(false);
+  });
 });

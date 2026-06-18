@@ -15,7 +15,9 @@ async function main(): Promise<void> {
       error instanceof OptionError ||
       error instanceof PathEscapeError ||
       (error instanceof Error && error.name === 'EmptySeedError') ||
-      (error instanceof Error && error.name === 'UnknownAlgorithmError')
+      (error instanceof Error && error.name === 'UnknownAlgorithmError') ||
+      (error instanceof Error && error.name === 'SvgParseError') ||
+      (error instanceof Error && error.name === 'InputFileError')
     ) {
       consoleIO.error(`${pc.red('error')} ${error.message}`);
       process.exitCode = 1;

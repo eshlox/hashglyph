@@ -25,6 +25,17 @@ import { writeArtifacts } from './runner.js';
 
 const VERSION = '1.0.0';
 
+/** Read an input file, turning any read failure into a clean, user-facing error. */
+async function readInput(file: string): Promise<string> {
+  try {
+    return await readFile(file, 'utf8');
+  } catch {
+    const error = new Error(`Cannot read file "${file}".`);
+    error.name = 'InputFileError';
+    throw error;
+  }
+}
+
 interface BuildOptions {
   io: IO;
   /** Override the writer (tests). Defaults to writing real files. */
@@ -170,7 +181,7 @@ export function buildProgram(opts: BuildOptions): Command {
     .description('Read the digest back out of a HashGlyph SVG')
     .option('--style <id>', 'render style of the SVG', 'mono-16')
     .action(async (file: string, raw: { style: string }) => {
-      const svg = await readFile(file, 'utf8');
+      const svg = await readInput(file);
       printResult(runDecode({ svg, style: parseStyle(raw.style) }));
     });
 
@@ -180,7 +191,7 @@ export function buildProgram(opts: BuildOptions): Command {
     .option('--hash <id>', 'hash the seed was generated with', 'blake3')
     .option('--style <id>', 'render style of the SVG', 'mono-16')
     .action(async (file: string, seed: string, raw: { hash: string; style: string }) => {
-      const svg = await readFile(file, 'utf8');
+      const svg = await readInput(file);
       const result = runVerify({
         svg,
         seed,

@@ -22,24 +22,32 @@ export function digestFor(seed: string, hash: HashId): Uint8Array {
   return getHash(hash).expand(material, DIGEST_BYTES);
 }
 
-function bytesEqual(a: Uint8Array, b: Uint8Array): boolean {
+/** Strict, structural grid equality: same dimensions and identical cell values. */
+function gridsEqual(a: Grid, b: Grid): boolean {
   if (a.length !== b.length) return false;
-  let diff = 0;
-  for (let i = 0; i < a.length; i += 1) diff |= (a[i] ?? 0) ^ (b[i] ?? 0);
-  return diff === 0;
+  for (let y = 0; y < b.length; y += 1) {
+    const rowA = a[y];
+    const rowB = b[y];
+    if (!rowA || !rowB || rowA.length !== rowB.length) return false;
+    for (let x = 0; x < rowB.length; x += 1) {
+      if (rowA[x] !== rowB[x]) return false;
+    }
+  }
+  return true;
 }
 
 /**
  * Prove that `grid` is exactly the glyph `(seed, hash)` produces under `style`.
  *
- * This re-derives the digest from the seed and compares it to the one read back
- * out of the grid. It cannot reveal the seed (the hash is one-way); it only
- * confirms a seed you already have.
+ * The grid must match the canonical encoding cell-for-cell: right dimensions,
+ * right palette indices, no extra rows/columns or out-of-range values. (This is
+ * stricter than digest-equivalence, which would accept padded rows or cell
+ * values that share the same low bits.) It cannot reveal the seed (the hash is
+ * one-way); it only confirms a seed you already have.
  */
 export function verifyGlyph(grid: Grid, style: StyleId, seed: string, hash: HashId): boolean {
   const resolved = getStyle(style);
-  if (grid.length !== resolved.size) return false;
-  return bytesEqual(resolved.decode(grid), digestFor(seed, hash));
+  return gridsEqual(grid, resolved.encode(digestFor(seed, hash)));
 }
 
 export { DIGEST_BYTES };

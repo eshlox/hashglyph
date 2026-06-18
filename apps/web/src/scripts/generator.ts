@@ -106,6 +106,7 @@ export function initGenerator(): void {
       view.qrPreview.replaceChildren();
       view.digest.textContent = '…';
       view.material.textContent = '…';
+      runVerify(); // clears the stale match/mismatch result (current is null)
       updatePermalink();
       return;
     }

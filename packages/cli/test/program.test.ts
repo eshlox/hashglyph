@@ -143,4 +143,26 @@ describe('decode / verify round-trip on generated SVG', () => {
       expect(runVerify({ svg, style, seed: 'acme', hash: 'sha256' }).ok).toBe(false);
     });
   }
+
+  it('rejects a tampered SVG (non-square viewBox) instead of accepting it', async () => {
+    const svg = await svgFor('acme', 'mono-16');
+    const tampered = svg.replace(/viewBox="0 0 18 18"/, 'viewBox="0 0 18 999"');
+    expect(() =>
+      runVerify({ svg: tampered, style: 'mono-16', seed: 'acme', hash: 'blake3' }),
+    ).toThrow(/not square/i);
+  });
+
+  it('rejects an SVG with a painted cell outside the grid', async () => {
+    const svg = await svgFor('acme', 'mono-16');
+    // Inject an out-of-bounds cell into the foreground group.
+    const tampered = svg.replace('</g>', '<rect x="900" y="900" width="1" height="1"/></g>');
+    expect(() => runDecode({ svg: tampered, style: 'mono-16' })).toThrow(/outside/i);
+  });
+
+  it('raises a clean InputFileError (handled by the CLI) for an unreadable file', async () => {
+    const { io } = fakeIO();
+    const promise = run(['decode', '/no/such/file.svg'], io);
+    await expect(promise).rejects.toThrow(/Cannot read file/);
+    await expect(promise).rejects.toMatchObject({ name: 'InputFileError' });
+  });
 });

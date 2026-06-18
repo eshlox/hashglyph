@@ -60,7 +60,7 @@ export interface HashProvider {
    * Deterministically derive exactly `length` bytes from `material`.
    *
    * Extendable-output functions (BLAKE3, SHAKE) use their native XOF. Fixed-length
-   * hashes use an HKDF-style counter expansion: `prk = H(material)`, then
+   * hashes use a counter-mode expansion: `prk = H(material)`, then
    * `H(prk ‖ u32be(0)) ‖ H(prk ‖ u32be(1)) ‖ …` truncated to `length`. Expansion
    * never adds entropy: a hash's real strength stays its native digest width.
    */

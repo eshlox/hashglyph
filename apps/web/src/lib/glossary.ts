@@ -172,11 +172,11 @@ export const CONCEPTS: ReadonlyArray<GlossaryNote & { term: string }> = [
     source: 'NIST FIPS 202',
   },
   {
-    term: 'Counter expansion (HKDF-style)',
+    term: 'Counter-mode expansion',
     blurb:
-      'Fixed-length hashes can not stretch, so we re-hash with a rising counter until we have 256 bits. This never adds entropy beyond the hash itself.',
-    href: 'https://www.rfc-editor.org/rfc/rfc5869',
-    source: 'RFC 5869 (HKDF)',
+      'Fixed-length hashes can not stretch, so we re-hash with a rising counter (H(prk ‖ i)) until we have 256 bits. This never adds entropy beyond the hash itself.',
+    href: 'https://csrc.nist.gov/pubs/sp/800/108/r1/final',
+    source: 'NIST SP 800-108',
   },
   {
     term: 'QR mode',
