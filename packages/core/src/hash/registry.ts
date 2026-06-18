@@ -33,6 +33,17 @@ export type HashId =
   | 'sha1'
   | 'md5';
 
+/**
+ * Collision-resistance honesty tier for a hash, given a 256-bit glyph:
+ *
+ * - `strong`: ≥256-bit, modern. Two seeds sharing a glyph is infeasible (~2^128).
+ * - `reduced`: native digest is under 256 bits, so the glyph's real entropy is
+ *   capped below the canvas. Not broken, but a smaller safety margin.
+ * - `broken`: collisions can be constructed deliberately — two different strings
+ *   can be forced to the same glyph. Fun only; never relied on for uniqueness.
+ */
+export type HashTier = 'strong' | 'reduced' | 'broken';
+
 /** The default hash. BLAKE3 produces the canonical mark for any seed. */
 export const DEFAULT_HASH: HashId = 'blake3';
 
@@ -43,12 +54,15 @@ export interface HashProvider {
   readonly label: string;
   /** One-line description. */
   readonly description: string;
+  /** Collision-resistance tier for the uniqueness guarantee. */
+  readonly tier: HashTier;
   /**
    * Deterministically derive exactly `length` bytes from `material`.
    *
    * Extendable-output functions (BLAKE3, SHAKE) use their native XOF. Fixed-length
    * hashes use an HKDF-style counter expansion: `prk = H(material)`, then
-   * `H(prk ‖ u32be(0)) ‖ H(prk ‖ u32be(1)) ‖ …` truncated to `length`.
+   * `H(prk ‖ u32be(0)) ‖ H(prk ‖ u32be(1)) ‖ …` truncated to `length`. Expansion
+   * never adds entropy: a hash's real strength stays its native digest width.
    */
   expand(material: string, length: number): Uint8Array;
 }
@@ -90,22 +104,31 @@ function counterExpand(hash: FixedHash, material: string, length: number): Uint8
 function fixedProvider(
   id: HashId,
   label: string,
+  tier: HashTier,
   description: string,
   hash: FixedHash,
 ): HashProvider {
   return {
     id,
     label,
+    tier,
     description,
     expand: (material, length) => counterExpand(hash, material, length),
   };
 }
 
 /** Provider for native extendable-output functions (XOFs): no counter expansion needed. */
-function xofProvider(id: HashId, label: string, description: string, xof: Xof): HashProvider {
+function xofProvider(
+  id: HashId,
+  label: string,
+  tier: HashTier,
+  description: string,
+  xof: Xof,
+): HashProvider {
   return {
     id,
     label,
+    tier,
     description,
     expand: (material, length) => {
       if (length < 0) {
@@ -121,18 +144,21 @@ const PROVIDERS: Record<HashId, HashProvider> = {
   blake3: xofProvider(
     'blake3',
     'BLAKE3',
+    'strong',
     'Modern XOF hash. Fast, extendable, and the canonical default.',
     blake3,
   ),
   shake128: xofProvider(
     'shake128',
     'SHAKE128',
+    'strong',
     'SHA-3 extendable-output function (NIST FIPS 202).',
     shake128,
   ),
   shake256: xofProvider(
     'shake256',
     'SHAKE256',
+    'strong',
     'Wider SHA-3 XOF with a larger security margin.',
     shake256,
   ),
@@ -140,12 +166,14 @@ const PROVIDERS: Record<HashId, HashProvider> = {
   blake2b: fixedProvider(
     'blake2b',
     'BLAKE2b',
+    'strong',
     '64-bit-optimized BLAKE2. Used by Zcash, libsodium, and Argon2.',
     blake2b,
   ),
   blake2s: fixedProvider(
     'blake2s',
     'BLAKE2s',
+    'strong',
     '32-bit-optimized BLAKE2 for smaller architectures.',
     blake2s,
   ),
@@ -153,20 +181,35 @@ const PROVIDERS: Record<HashId, HashProvider> = {
   sha256: fixedProvider(
     'sha256',
     'SHA-256',
-    'NIST FIPS 180-4 standard. Counter-expanded to fill the bit budget.',
+    'strong',
+    'NIST FIPS 180-4 standard. 256-bit, the workhorse hash.',
     sha256,
   ),
-  sha224: fixedProvider('sha224', 'SHA-224', 'Truncated SHA-2 variant.', sha224),
-  sha384: fixedProvider('sha384', 'SHA-384', 'Truncated SHA-512 variant.', sha384),
+  sha224: fixedProvider(
+    'sha224',
+    'SHA-224',
+    'reduced',
+    'Truncated SHA-2 variant: only 224 native bits, so a smaller margin.',
+    sha224,
+  ),
+  sha384: fixedProvider(
+    'sha384',
+    'SHA-384',
+    'strong',
+    'Truncated SHA-512 variant, 384 native bits.',
+    sha384,
+  ),
   sha512: fixedProvider(
     'sha512',
     'SHA-512',
-    'Wider SHA-2 variant. Counter-expanded for arbitrary output length.',
+    'strong',
+    'Wider SHA-2 variant. Fast on 64-bit CPUs.',
     sha512,
   ),
   'sha512-256': fixedProvider(
     'sha512-256',
     'SHA-512/256',
+    'strong',
     'SHA-512 truncated to 256 bits (faster than SHA-256 on 64-bit CPUs).',
     sha512_256,
   ),
@@ -174,34 +217,45 @@ const PROVIDERS: Record<HashId, HashProvider> = {
   'sha3-256': fixedProvider(
     'sha3-256',
     'SHA3-256',
+    'strong',
     'Keccak-based NIST FIPS 202 standard.',
     sha3_256,
   ),
-  'sha3-512': fixedProvider('sha3-512', 'SHA3-512', 'Wider SHA-3 variant.', sha3_512),
+  'sha3-512': fixedProvider('sha3-512', 'SHA3-512', 'strong', 'Wider SHA-3 variant.', sha3_512),
   keccak256: fixedProvider(
     'keccak256',
     'Keccak-256',
+    'strong',
     'Original Keccak padding (as used by Ethereum).',
     keccak_256,
   ),
-  keccak512: fixedProvider('keccak512', 'Keccak-512', 'Wider original-padding Keccak.', keccak_512),
-  // --- Legacy / shorter digests (RIPEMD-160 still secures Bitcoin & Ethereum addresses) ---
+  keccak512: fixedProvider(
+    'keccak512',
+    'Keccak-512',
+    'strong',
+    'Wider original-padding Keccak.',
+    keccak_512,
+  ),
+  // --- Legacy / shorter digests ---
   ripemd160: fixedProvider(
     'ripemd160',
     'RIPEMD-160',
-    '160-bit hash behind Bitcoin and Ethereum addresses.',
+    'reduced',
+    '160-bit hash behind Bitcoin and Ethereum addresses. Small margin, not broken.',
     ripemd160,
   ),
   sha1: fixedProvider(
     'sha1',
     'SHA-1',
-    'Legacy 160-bit hash. Cryptographically broken; still git’s object id.',
+    'broken',
+    'Legacy 160-bit hash. Collisions are demonstrable; not collision-safe.',
     sha1,
   ),
   md5: fixedProvider(
     'md5',
     'MD5',
-    'Legacy 128-bit hash. Cryptographically broken; for recognizability only.',
+    'broken',
+    'Legacy 128-bit hash. Collisions are trivial to construct; for fun only.',
     md5,
   ),
 };
@@ -235,7 +289,7 @@ export function isHashId(id: string): id is HashId {
   return Object.hasOwn(PROVIDERS, id);
 }
 
-/** Look up a hash provider. @throws {UnknownAlgorithmError} for unknown ids. */
+/** Look up a hash provider. @throws {UnknownAlgorithmError} for an unknown id. */
 export function getHash(id: HashId): HashProvider {
   const provider = PROVIDERS[id];
   if (!provider) {

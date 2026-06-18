@@ -2,6 +2,19 @@ import { describe, expect, it } from 'vitest';
 import { getHash, HASH_IDS, HASHES, isHashId, UnknownAlgorithmError } from '../src/index.js';
 
 describe('hash registry', () => {
+  it('labels every hash with a collision-resistance tier', () => {
+    const tiers = Object.fromEntries(HASHES.map((h) => [h.id, h.tier]));
+    expect(tiers.blake3).toBe('strong');
+    expect(tiers.sha256).toBe('strong');
+    expect(tiers.sha224).toBe('reduced');
+    expect(tiers.ripemd160).toBe('reduced');
+    expect(tiers.sha1).toBe('broken');
+    expect(tiers.md5).toBe('broken');
+    for (const h of HASHES) {
+      expect(['strong', 'reduced', 'broken']).toContain(h.tier);
+    }
+  });
+
   it('exposes all expected hashes', () => {
     expect(HASH_IDS).toEqual([
       'blake3',
@@ -69,12 +82,10 @@ describe('hash registry', () => {
       expect(long.slice(0, 32)).toEqual(short);
     });
 
-    it('blake3 reproduces the canonical 64-byte digest', () => {
+    it('blake3 reproduces the canonical digest for the project material', () => {
       const blake = getHash('blake3');
-      const hex = Buffer.from(blake.expand('hashglyph-core-accents-v1|hashglyph', 64)).toString(
-        'hex',
-      );
-      expect(hex.startsWith('bfd24b02875f3d34')).toBe(true);
+      const hex = Buffer.from(blake.expand('hashglyph-v2|hashglyph', 32)).toString('hex');
+      expect(hex).toBe('70d824582c9c3e3560c255cbba79e7ead272920df7054db08c68ee58fcfd60e7');
     });
   });
 });

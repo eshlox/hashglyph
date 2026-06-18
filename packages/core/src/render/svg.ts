@@ -1,6 +1,6 @@
 import type { Glyph } from '../glyph.js';
 import type { Grid } from '../grid.js';
-import { GRID_SIZE } from '../version.js';
+import type { Palette } from '../style/types.js';
 import { assertSafeColor } from './color.js';
 import { escapeXml } from './xml.js';
 
@@ -9,7 +9,10 @@ export type PixelShape = 'square' | 'rounded';
 
 /** Options controlling SVG output. All have safe, brand-accurate defaults. */
 export interface SvgOptions {
-  /** Foreground (pixel) color. Default `#000000`. */
+  /**
+   * Foreground (pixel) color for monochrome glyphs. Default `#000000`. Ignored by
+   * multi-color styles, which carry their own fixed palette.
+   */
   readonly fg?: string;
   /** Background color, or `null`/`'transparent'` for none. Default `#ffffff`. */
   readonly bg?: string | null;
@@ -51,21 +54,51 @@ function clampScale(scale: number): number {
   return Math.floor(scale);
 }
 
-/** Build the `<rect>` body for all on-cells, in module (cell) coordinates. */
-function renderCells(grid: Grid, padding: number, shape: PixelShape, radius: number): string {
-  const rects: string[] = [];
+/**
+ * Resolve the palette actually painted. For a monochrome (2-entry) palette the
+ * `fg` option overrides the ink; multi-color palettes are used as-is. Every
+ * painted color is validated.
+ */
+function resolvePalette(base: Palette, fg: string | undefined): (string | null)[] {
+  const palette = base.slice();
+  if (fg !== undefined && palette.length === 2) {
+    palette[1] = fg;
+  }
+  return palette.map((color, index) =>
+    color === null ? null : assertSafeColor(`palette[${index}]`, color),
+  );
+}
+
+/** Build a `<g fill>` group per palette color, holding that color's cells. */
+function renderGroups(
+  grid: Grid,
+  palette: readonly (string | null)[],
+  padding: number,
+  shape: PixelShape,
+  radius: number,
+): string {
   const rx = shape === 'rounded' ? ` rx="${+radius.toFixed(4)}"` : '';
+  const crisp = shape === 'square' ? ' shape-rendering="crispEdges"' : '';
+  const byColor = new Map<number, string[]>();
   for (let y = 0; y < grid.length; y += 1) {
     const row = grid[y];
     if (!row) continue;
     for (let x = 0; x < row.length; x += 1) {
-      if (!row[x]) continue;
-      const px = padding + x;
-      const py = padding + y;
-      rects.push(`    <rect x="${px}" y="${py}" width="1" height="1"${rx}/>`);
+      const value = row[x] ?? 0;
+      if (!value || palette[value] == null) continue;
+      const rect = `    <rect x="${padding + x}" y="${padding + y}" width="1" height="1"${rx}/>`;
+      let bucket = byColor.get(value);
+      if (!bucket) {
+        bucket = [];
+        byColor.set(value, bucket);
+      }
+      bucket.push(rect);
     }
   }
-  return rects.join('\n');
+  return [...byColor.entries()]
+    .sort((a, b) => a[0] - b[0])
+    .map(([value, rects]) => `  <g fill="${palette[value]}"${crisp}>\n${rects.join('\n')}\n  </g>`)
+    .join('\n');
 }
 
 /**
@@ -77,7 +110,7 @@ function renderCells(grid: Grid, padding: number, shape: PixelShape, radius: num
  * HTML, write to a `.svg` file, or rasterize via canvas/sharp.
  */
 export function renderSvg(glyph: Glyph, options: SvgOptions = {}): string {
-  const fg = assertSafeColor('fg', options.fg ?? DEFAULTS.fg);
+  const fg = options.fg === undefined ? undefined : assertSafeColor('fg', options.fg);
   const bgRaw = options.bg === undefined ? DEFAULTS.bg : options.bg;
   const bg = bgRaw === null ? null : assertSafeColor('bg', bgRaw);
   const shape = options.pixel ?? DEFAULTS.pixel;
@@ -85,7 +118,8 @@ export function renderSvg(glyph: Glyph, options: SvgOptions = {}): string {
   const padding = clampPadding(options.padding ?? DEFAULTS.padding);
   const scale = clampScale(options.scale ?? DEFAULTS.scale);
 
-  const gridSize = glyph.grid.length || GRID_SIZE;
+  const palette = resolvePalette(glyph.palette, fg ?? DEFAULTS.fg);
+  const gridSize = glyph.grid.length;
   const modules = gridSize + padding * 2;
   const size = modules * scale;
 
@@ -94,15 +128,12 @@ export function renderSvg(glyph: Glyph, options: SvgOptions = {}): string {
 
   const background =
     bg === null ? '' : `  <rect width="${modules}" height="${modules}" fill="${bg}"/>\n`;
-  const crisp = shape === 'square' ? ' shape-rendering="crispEdges"' : '';
-  const cells = renderCells(glyph.grid, padding, shape, radius);
+  const groups = renderGroups(glyph.grid, palette, padding, shape, radius);
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${modules} ${modules}" width="${size}" height="${size}" role="img" aria-label="${label}">
   <title>${title}</title>
-${background}  <g fill="${fg}"${crisp}>
-${cells}
-  </g>
+${background}${groups}
 </svg>
 `;
 }

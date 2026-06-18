@@ -32,16 +32,25 @@ describe('renderSvg options', () => {
   });
 
   it('grows the viewBox with padding (quiet zone)', () => {
-    expect(renderSvg(glyph, { padding: 0 })).toContain('viewBox="0 0 9 9"');
-    expect(renderSvg(glyph, { padding: 1 })).toContain('viewBox="0 0 11 11"');
-    expect(renderSvg(glyph, { padding: 3 })).toContain('viewBox="0 0 15 15"');
+    expect(renderSvg(glyph, { padding: 0 })).toContain('viewBox="0 0 16 16"');
+    expect(renderSvg(glyph, { padding: 1 })).toContain('viewBox="0 0 18 18"');
+    expect(renderSvg(glyph, { padding: 3 })).toContain('viewBox="0 0 22 22"');
   });
 
   it('scales width/height while keeping the module viewBox', () => {
     const svg = renderSvg(glyph, { padding: 0, scale: 100 });
-    expect(svg).toContain('viewBox="0 0 9 9"');
-    expect(svg).toContain('width="900"');
-    expect(svg).toContain('height="900"');
+    expect(svg).toContain('viewBox="0 0 16 16"');
+    expect(svg).toContain('width="1600"');
+    expect(svg).toContain('height="1600"');
+  });
+
+  it('paints a multi-color palette for the color-8 style (ignoring fg)', () => {
+    const color = generateGlyph({ seed: 'hashglyph', style: 'color-8' });
+    const svg = renderSvg(color, { fg: '#ff0000' });
+    // The fixed palette is used; fg does not override a multi-color style.
+    expect(svg).not.toContain('fill="#ff0000"');
+    expect((svg.match(/<g fill="#/g) ?? []).length).toBeGreaterThan(1);
+    expect(svg).toContain('viewBox="0 0 10 10"'); // 8 + padding 1 each side
   });
 
   it('clamps nonsensical numeric options instead of throwing', () => {

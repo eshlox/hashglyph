@@ -1,13 +1,20 @@
 /**
  * @eshlox/hashglyph-core
  *
- * Deterministic pixel-glyph engine. Turn any seed into a stable 9×9 mark via a
- * pluggable (hash × grammar) pipeline, and render it to SVG. Isomorphic: the
- * same code runs in Node and the browser, byte for byte.
+ * Deterministic pixel-glyph engine. Turn any seed into a stable mark via a
+ * `(hash × style)` pipeline, and render it to SVG. The whole 256-bit digest is
+ * encoded losslessly, so the glyph is a reversible picture of its hash and two
+ * seeds colliding is computationally infeasible. Isomorphic: the same code runs
+ * in Node and the browser, byte for byte.
  */
 
 export { BitStream } from './bitstream.js';
-
+export {
+  decodeGlyph,
+  decodeGlyphHex,
+  digestFor,
+  verifyGlyph,
+} from './codec.js';
 export {
   EmptySeedError,
   HashGlyphError,
@@ -19,20 +26,6 @@ export {
   type Glyph,
   generateGlyph,
 } from './glyph.js';
-export {
-  DEFAULT_GRAMMAR,
-  GRAMMAR_IDS,
-  GRAMMARS,
-  getGrammar,
-  isGrammarId,
-} from './grammar/registry.js';
-export type {
-  AccentDecision,
-  GlyphGrammar,
-  GrammarContext,
-  GrammarId,
-  GrammarResult,
-} from './grammar/types.js';
 export {
   type Cell,
   countOn,
@@ -50,6 +43,7 @@ export {
   HASHES,
   type HashId,
   type HashProvider,
+  type HashTier,
   isHashId,
 } from './hash/registry.js';
 export { encodeIco, type IcoEntry } from './ico.js';
@@ -67,9 +61,18 @@ export {
   type SvgOptions,
 } from './render/svg.js';
 export { escapeXml } from './render/xml.js';
+export { COLOR_PALETTE, MONO_PALETTE } from './style/palette.js';
 export {
-  DIGEST_DISPLAY_BYTES,
-  GRID_SIZE,
+  DEFAULT_STYLE,
+  getStyle,
+  isStyleId,
+  STYLE_IDS,
+  STYLES,
+} from './style/registry.js';
+export type { GlyphStyle, Palette, StyleId } from './style/types.js';
+export {
+  DIGEST_BYTES,
+  MATERIAL_PREFIX,
   MATERIAL_SCHEMA,
 } from './version.js';
 export { createZip, type ZipFiles } from './zip.js';

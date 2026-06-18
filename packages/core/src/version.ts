@@ -2,20 +2,24 @@
  * Global stability constants for HashGlyph.
  *
  * These describe the *contract*, not the npm package version. Changing any of
- * them changes generated output and therefore MUST be accompanied by a new
- * versioned grammar id (e.g. `-v2`). Every glyph is frozen against
- * `MATERIAL_SCHEMA = 'v1'` forever.
+ * them changes generated output and therefore breaks every existing glyph.
  */
 
-/** Version of the seed → material recipe (`normalize` + the `id|seed` template). */
-export const MATERIAL_SCHEMA = 'v1' as const;
-
-/** Edge length of the pixel grid. The whole visual grammar assumes 9×9. */
-export const GRID_SIZE = 9 as const;
+/** Version of the seed → material recipe (`normalize` + the `prefix|seed` template). */
+export const MATERIAL_SCHEMA = 'v2' as const;
 
 /**
- * Number of digest bytes surfaced in metadata (`digestHex`) and fed to the
- * {@link BitStream}. 64 bytes = 512 bits, comfortably more than any grammar's
- * bit budget, and, for BLAKE3, exactly the canonical 64-byte digest.
+ * Domain-separation prefix prepended to every normalized seed before hashing.
+ * The hash material is `${MATERIAL_PREFIX}|${normalized}`. The hash and style
+ * are intentionally excluded: a fixed (hash, seed) pair yields one canonical
+ * digest, which the styles merely render differently.
  */
-export const DIGEST_DISPLAY_BYTES = 64 as const;
+export const MATERIAL_PREFIX = `hashglyph-${MATERIAL_SCHEMA}` as const;
+
+/**
+ * Width of the canonical identity digest, in bytes. 32 bytes = 256 bits: for any
+ * strong hash, finding two seeds that share a digest (and therefore a glyph) is
+ * computationally infeasible (~2^128 work). It is also exactly the capacity every
+ * render style encodes, so a glyph is a lossless picture of its digest.
+ */
+export const DIGEST_BYTES = 32 as const;

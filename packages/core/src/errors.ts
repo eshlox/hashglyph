@@ -11,10 +11,10 @@ export class EmptySeedError extends HashGlyphError {
   }
 }
 
-/** Thrown when an unknown hash or grammar id is requested. */
+/** Thrown when an unknown hash or style id is requested. */
 export class UnknownAlgorithmError extends HashGlyphError {
   override readonly name = 'UnknownAlgorithmError';
-  constructor(kind: 'hash' | 'grammar', id: string, known: readonly string[]) {
+  constructor(kind: 'hash' | 'style', id: string, known: readonly string[]) {
     super(`Unknown ${kind} "${id}". Known ${kind}s: ${known.join(', ')}.`);
   }
 }
