@@ -7,18 +7,18 @@ describe('parseState', () => {
   });
 
   it('parses valid params', () => {
-    const s = parseState('seed=portal&hash=sha256&grammar=quad-fold-v1&rounded=1&padding=2');
+    const s = parseState('seed=portal&hash=sha256&style=color-8&rounded=1&padding=2');
     expect(s.seed).toBe('portal');
     expect(s.hash).toBe('sha256');
-    expect(s.grammar).toBe('quad-fold-v1');
+    expect(s.style).toBe('color-8');
     expect(s.rounded).toBe(true);
     expect(s.padding).toBe(2);
   });
 
   it('falls back to safe defaults for invalid params (never throws)', () => {
-    const s = parseState('hash=crc32&grammar=evil&fg=url(%23x)&padding=99');
+    const s = parseState('hash=crc32&style=evil&fg=url(%23x)&padding=99');
     expect(s.hash).toBe('blake3');
-    expect(s.grammar).toBe('core-accents-v1');
+    expect(s.style).toBe('mono-16');
     expect(s.fg).toBe(DEFAULT_STATE.fg);
     expect(s.padding).toBe(DEFAULT_STATE.padding);
   });
@@ -88,7 +88,7 @@ describe('toQuery', () => {
   });
 
   it('round-trips with parseState', () => {
-    const original = { ...DEFAULT_STATE, seed: 'orbit', grammar: 'mirror-identicon-v1' as const };
+    const original = { ...DEFAULT_STATE, seed: 'orbit', style: 'color-8' as const };
     expect(parseState(toQuery(original))).toEqual(original);
   });
 });

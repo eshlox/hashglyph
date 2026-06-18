@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { expect, test } from '@playwright/test';
 
-const CANONICAL_DIGEST_PREFIX = 'bfd24b02';
+const CANONICAL_DIGEST_PREFIX = '70d82458';
 
 test.describe('HashGlyph site', () => {
   test('renders SEO metadata and JSON-LD', async ({ page }) => {
@@ -39,7 +39,7 @@ test.describe('HashGlyph site', () => {
     await page.goto('/');
     await expect(page.locator('#preview svg')).toBeVisible();
     await expect(page.locator('#digest')).toHaveText(new RegExp(`^${CANONICAL_DIGEST_PREFIX}`));
-    await expect(page.locator('#material')).toHaveText('hashglyph-core-accents-v1|hashglyph');
+    await expect(page.locator('#material')).toHaveText('hashglyph-v2|hashglyph');
   });
 
   test('typing a seed updates the glyph and the permalink', async ({ page }) => {
@@ -52,26 +52,26 @@ test.describe('HashGlyph site', () => {
   });
 
   test('permalink round-trips state from the URL', async ({ page }) => {
-    await page.goto('/?seed=portal&grammar=quad-fold-v1&hash=sha256');
+    await page.goto('/?seed=portal&style=color-8&hash=sha256');
     await expect(page.locator('#seed')).toHaveValue('portal');
-    await expect(page.locator('#grammar')).toHaveValue('quad-fold-v1');
+    await expect(page.locator('#style')).toHaveValue('color-8');
     await expect(page.locator('#hash')).toHaveValue('sha256');
   });
 
   test('invalid permalink params fall back to defaults (never throws)', async ({ page }) => {
-    await page.goto('/?grammar=evil&hash=crc32&fg=url(%23x)');
+    await page.goto('/?style=evil&hash=crc32&fg=url(%23x)');
     await expect(page.locator('#preview svg')).toBeVisible();
-    await expect(page.locator('#grammar')).toHaveValue('core-accents-v1');
+    await expect(page.locator('#style')).toHaveValue('mono-16');
     await expect(page.locator('#hash')).toHaveValue('blake3');
   });
 
-  test('the grammar matrix has all grammars and is clickable', async ({ page }) => {
+  test('the style picker has all styles and is clickable', async ({ page }) => {
     await page.goto('/');
     const cells = page.locator('#matrix .matrix-cell');
-    await expect(cells).toHaveCount(5);
-    await cells.nth(2).click();
-    await expect(page.locator('#grammar')).toHaveValue('symmetric-mask-v1');
-    await expect(page).toHaveURL(/grammar=symmetric-mask-v1/);
+    await expect(cells).toHaveCount(2);
+    await cells.nth(1).click();
+    await expect(page.locator('#style')).toHaveValue('color-8');
+    await expect(page).toHaveURL(/style=color-8/);
   });
 
   test('copy SVG writes valid SVG markup to the clipboard', async ({ page, context }) => {

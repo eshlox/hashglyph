@@ -1,4 +1,4 @@
-import type { GrammarId, HashId } from '@eshlox/hashglyph-core';
+import type { HashId, StyleId } from '@eshlox/hashglyph-core';
 
 /** A glossary entry: a plain-English line plus a link to read more from the source. */
 export interface GlossaryNote {
@@ -108,35 +108,21 @@ export const HASH_NOTES: Record<HashId, GlossaryNote> = {
   },
 };
 
-const GRAMMAR_SRC = (id: GrammarId) =>
-  `https://github.com/eshlox/hashglyph/blob/main/packages/core/src/grammar/${id}.ts`;
+const STYLE_SRC =
+  'https://github.com/eshlox/hashglyph/blob/main/packages/core/src/style/registry.ts';
 
-/** One plain note per grammar. Keyed by GrammarId so every shipped grammar is covered. */
-export const GRAMMAR_NOTES: Record<GrammarId, GlossaryNote> = {
-  'core-accents-v1': {
+/** One plain note per render style. Keyed by StyleId so every shipped style is covered. */
+export const STYLE_NOTES: Record<StyleId, GlossaryNote> = {
+  'mono-16': {
     blurb:
-      'The default look: a fixed brand shell with a handful of pixels painted by the hash. Reads as a logo, not noise.',
-    href: GRAMMAR_SRC('core-accents-v1'),
+      'Black & white 16×16 grid. Every one of the 256 digest bits is one pixel, so the whole hash is on the wall and reads back exactly.',
+    href: STYLE_SRC,
     source: 'source',
   },
-  'mirror-identicon-v1': {
-    blurb: 'Left/right-mirrored dots, like the classic GitHub identicon.',
-    href: GRAMMAR_SRC('mirror-identicon-v1'),
-    source: 'source',
-  },
-  'symmetric-mask-v1': {
-    blurb: 'Hash pixels clipped to a diamond mask, so it always lands as a clean badge silhouette.',
-    href: GRAMMAR_SRC('symmetric-mask-v1'),
-    source: 'source',
-  },
-  'quad-fold-v1': {
-    blurb: 'One corner mirrored four ways into a balanced, kaleidoscopic ornament.',
-    href: GRAMMAR_SRC('quad-fold-v1'),
-    source: 'source',
-  },
-  'cellular-automata-v1': {
-    blurb: 'A Rule-90 pattern grown row by row from a hashed starting line — the nerdy one.',
-    href: GRAMMAR_SRC('cellular-automata-v1'),
+  'color-8': {
+    blurb:
+      'An 8×8 mosaic where every 4 bits choose one of 16 colors. The same digest as mono, shown in color.',
+    href: STYLE_SRC,
     source: 'source',
   },
 };
@@ -144,39 +130,53 @@ export const GRAMMAR_NOTES: Record<GrammarId, GlossaryNote> = {
 /** Other cryptographic / engineering concepts the pipeline relies on. */
 export const CONCEPTS: ReadonlyArray<GlossaryNote & { term: string }> = [
   {
+    term: 'Digest = identity',
+    blurb:
+      'Your glyph is the full 256-bit hash of your seed, drawn pixel by pixel. That digest is the unique id; the picture is just a view of it.',
+    href: 'https://github.com/eshlox/hashglyph#how-it-works',
+    source: 'how it works',
+  },
+  {
+    term: 'Reversible (decode)',
+    blurb:
+      'Because no bits are thrown away, a glyph reads back into its exact digest. You still can not recover the original text: hashing is one-way.',
+    href: 'https://github.com/eshlox/hashglyph#decode--verify',
+    source: 'decode & verify',
+  },
+  {
+    term: 'Collision resistance',
+    blurb:
+      'With a strong 256-bit hash, two different seeds landing on the same glyph is computationally infeasible. Broken hashes (MD5, SHA-1) can be forced to collide, so they are for fun only.',
+    href: 'https://en.wikipedia.org/wiki/Collision_resistance',
+    source: 'collision resistance',
+  },
+  {
     term: 'Seed normalization (NFKC)',
     blurb:
-      'Before hashing we Unicode-normalize, trim, and lowercase your text, so visually identical names map to the same glyph.',
+      'Before hashing we Unicode-normalize, trim, and lowercase your text, so Acme and acme map to the same glyph.',
     href: 'https://unicode.org/reports/tr15/',
     source: 'Unicode UAX #15',
   },
   {
     term: 'Domain separation',
     blurb:
-      'We prefix the grammar id before hashing (grammar-id|name). Same name, different grammar → a genuinely different mark.',
+      'We prefix a frozen tag before hashing (hashglyph-v2|name) so HashGlyph digests never clash with the same name hashed elsewhere.',
     href: 'https://github.com/eshlox/hashglyph#the-determinism-contract',
     source: 'determinism contract',
   },
   {
     term: 'XOF (extendable output)',
     blurb:
-      'A hash that emits any number of bytes you ask for. BLAKE3 and SHAKE are XOFs, so they fill the grid natively.',
+      'A hash that emits any number of bytes you ask for. BLAKE3 and SHAKE are XOFs, so they produce the 256-bit digest natively.',
     href: FIPS_202,
     source: 'NIST FIPS 202',
   },
   {
     term: 'Counter expansion (HKDF-style)',
     blurb:
-      'Fixed-length hashes can’t stretch, so we re-hash with a rising counter and concatenate until the grid is full.',
+      'Fixed-length hashes can not stretch, so we re-hash with a rising counter until we have 256 bits. This never adds entropy beyond the hash itself.',
     href: 'https://www.rfc-editor.org/rfc/rfc5869',
     source: 'RFC 5869 (HKDF)',
-  },
-  {
-    term: 'Bitstream (MSB-first)',
-    blurb:
-      'The digest is read one bit at a time, most-significant bit first; each bit decides whether a pixel is on.',
-    href: 'https://github.com/eshlox/hashglyph#how-it-works',
-    source: 'how it works',
   },
   {
     term: 'QR mode',

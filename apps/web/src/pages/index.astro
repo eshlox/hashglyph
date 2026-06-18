@@ -1,7 +1,7 @@
 ---
-import { GRAMMARS, generateGlyph, HASHES, renderSvg } from '@eshlox/hashglyph-core';
+import { generateGlyph, HASHES, renderSvg, STYLES } from '@eshlox/hashglyph-core';
 import Seo from '../components/Seo.astro';
-import { CONCEPTS, GRAMMAR_NOTES, HASH_NOTES } from '../lib/glossary';
+import { CONCEPTS, HASH_NOTES, STYLE_NOTES } from '../lib/glossary';
 import { SITE, SITE_DESCRIPTION, SITE_TITLE, SOCIAL_LINKS } from '../lib/site';
 import '../styles/global.css';
 
@@ -15,15 +15,16 @@ const brandMark = stripProlog(
   renderSvg(generateGlyph({ seed: 'hashglyph' }), { padding: 1, scale: 10 }),
 );
 
-// Sample marks for the matrix reference table (the project's own seed).
-const sampleRows = GRAMMARS.map((g) => {
-  const glyph = generateGlyph({ seed: 'hashglyph', grammar: g.id });
-  return { id: g.id, label: g.label, digest: glyph.digestHex.slice(0, 12) };
+// One sample digest per hash for the reference table. The style never changes the
+// digest, so the hash is what makes each glyph unique.
+const sampleRows = HASHES.map((h) => {
+  const glyph = generateGlyph({ seed: 'hashglyph', hash: h.id });
+  return { id: h.id, label: h.label, tier: h.tier, digest: glyph.digestHex.slice(0, 16) };
 });
 
 // Glossary rows, driven off the live registries so nothing drifts out of sync.
-const hashGlossary = HASHES.map((h) => ({ id: h.id, label: h.label, ...HASH_NOTES[h.id] }));
-const grammarGlossary = GRAMMARS.map((g) => ({ id: g.id, label: g.label, ...GRAMMAR_NOTES[g.id] }));
+const hashGlossary = HASHES.map((h) => ({ id: h.id, label: h.label, tier: h.tier, ...HASH_NOTES[h.id] }));
+const styleGlossary = STYLES.map((s) => ({ id: s.id, label: s.label, ...STYLE_NOTES[s.id] }));
 ---
 
 <!doctype html>
@@ -80,13 +81,15 @@ const grammarGlossary = GRAMMARS.map((g) => ({ id: g.id, label: g.label, ...GRAM
               <div class="field">
                 <label for="hash">Hash</label>
                 <select id="hash">
-                  {HASHES.map((h) => <option value={h.id}>{h.label}</option>)}
+                  {HASHES.map((h) => (
+                    <option value={h.id}>{h.label}{h.tier === 'strong' ? '' : ` — ${h.tier}`}</option>
+                  ))}
                 </select>
               </div>
               <div class="field">
-                <label for="grammar">Grammar</label>
-                <select id="grammar">
-                  {GRAMMARS.map((g) => <option value={g.id}>{g.label}</option>)}
+                <label for="style">Style</label>
+                <select id="style">
+                  {STYLES.map((s) => <option value={s.id}>{s.label}</option>)}
                 </select>
               </div>
             </div>
@@ -120,8 +123,15 @@ const grammarGlossary = GRAMMARS.map((g) => ({ id: g.id, label: g.label, ...GRAM
             <div class="provenance">
               <div class="kv">
                 <span>material</span><code id="material"></code>
-                <span>blake3 / 64</span><code id="digest"></code>
+                <span>digest (256-bit id)</span><code id="digest"></code>
               </div>
+            </div>
+
+            <div class="field" style="margin-top:14px">
+              <label for="verify-seed">Verify a name against this glyph</label>
+              <input id="verify-seed" type="text" autocomplete="off" spellcheck="false"
+                maxlength="64" placeholder="type a name to check…" />
+              <p id="verify-result" class="verify-result" data-state=""></p>
             </div>
           </div>
 
@@ -170,10 +180,10 @@ const grammarGlossary = GRAMMARS.map((g) => ({ id: g.id, label: g.label, ...GRAM
           </div>
         </div>
 
-        <!-- Algorithm matrix -->
+        <!-- Style picker -->
         <div class="card" style="margin-top:22px">
-          <h3>Switch the visual grammar</h3>
-          <div id="matrix" class="matrix" aria-label="Available grammars"></div>
+          <h3>Switch the render style</h3>
+          <div id="matrix" class="matrix" aria-label="Available styles"></div>
         </div>
       </section>
 
@@ -182,25 +192,25 @@ const grammarGlossary = GRAMMARS.map((g) => ({ id: g.id, label: g.label, ...GRAM
         <div class="wrap">
           <h2>How it works</h2>
           <p>
-            The seed is normalized, combined with a frozen algorithm id, and hashed. The resulting
-            bits are read most-significant-first and poured into a constrained 9×9 visual grammar. A
-            fixed brand core keeps the mark recognizable; the hash only drives a few accents. The
-            output is pure, deterministic, and reproducible anywhere.
+            The seed is normalized, prefixed with a frozen tag, and hashed to a 256-bit digest. Every
+            bit of that digest is drawn into the grid: 256 pixels in mono, or 64 four-bit color cells.
+            Nothing is thrown away, so the glyph is a lossless picture of the hash and reads straight
+            back into its digest.
           </p>
           <div class="pipeline">your-name
   ↓ <b>normalize</b>            NFKC · trim · lowercase
 your-name
-  ↓ <b>domain separation</b>   core-accents-v1|your-name
-  ↓ <b>BLAKE3</b>              hash bits…
-  ↓ <b>bitstream</b>           MSB-first → grammar
-9×9 glyph
+  ↓ <b>domain separation</b>   hashglyph-v2|your-name
+  ↓ <b>BLAKE3</b>              256-bit digest
+  ↓ <b>encode</b>              every bit → one pixel
+glyph  ⇄  digest
   ↓ <b>render</b>             SVG · PNG · ICO · QR</div>
 
           <div class="features">
-            <div class="feature"><span class="ic">// deterministic</span><h3>Same in, same out</h3><p>One seed maps to exactly one mark, forever. No timestamps, no randomness.</p></div>
-            <div class="feature"><span class="ic">// designed</span><h3>Not an identicon</h3><p>A fixed brand core makes it read as a logo; the hash only paints the accents.</p></div>
+            <div class="feature"><span class="ic">// deterministic</span><h3>Same in, same out</h3><p>One seed maps to exactly one glyph, forever. No timestamps, no randomness.</p></div>
+            <div class="feature"><span class="ic">// unique</span><h3>No two names collide</h3><p>The whole 256-bit hash is on the wall. With a strong hash, two names sharing a glyph is computationally infeasible.</p></div>
+            <div class="feature"><span class="ic">// reversible</span><h3>Decode &amp; verify</h3><p>Read a glyph back into its digest, or prove a name produced it. The original text stays private.</p></div>
             <div class="feature"><span class="ic">// portable</span><h3>Everywhere</h3><p>Crisp from 16px favicons to wall-sized SVG. Generation runs entirely in your browser.</p></div>
-            <div class="feature"><span class="ic">// frozen</span><h3>Versioned forever</h3><p>Grammars are pinned with a version suffix. Your logo never changes under you.</p></div>
           </div>
         </div>
       </section>
@@ -208,18 +218,18 @@ your-name
       <!-- ===================== ALGORITHMS ===================== -->
       <section id="algorithms" class="block">
         <div class="wrap">
-          <h2>Pick your algorithm</h2>
+          <h2>Pick your hash</h2>
           <p>
-            HashGlyph is pluggable on two axes: <strong>{HASHES.length} hash functions</strong> ×
-            <strong>{GRAMMARS.length} visual grammars</strong> = {HASHES.length * GRAMMARS.length}
-            combinations. BLAKE3 + Core&nbsp;+&nbsp;Accents is the default that mints each mark;
-            the rest are yours to explore.
+            The hash decides the glyph; the style only decides how it is drawn. Choose from
+            <strong>{HASHES.length} hashes</strong> rendered in <strong>{STYLES.length} styles</strong>.
+            BLAKE3 is the default. The digest below is the seed <code class="mono">hashglyph</code> under
+            each hash, so you can see how every one lands on a different glyph.
           </p>
           <table class="matrix-table">
-            <thead><tr><th>Grammar</th><th>Style</th><th>blake3(hashglyph)</th></tr></thead>
+            <thead><tr><th>Hash</th><th>id</th><th>tier</th><th>digest(hashglyph)</th></tr></thead>
             <tbody>
               {sampleRows.map((r) => (
-                <tr><td>{r.label}</td><td class="mono">{r.id}</td><td class="mono">{r.digest}…</td></tr>
+                <tr><td>{r.label}</td><td class="mono">{r.id}</td><td class="mono">{r.tier}</td><td class="mono">{r.digest}…</td></tr>
               ))}
             </tbody>
           </table>
@@ -231,26 +241,26 @@ your-name
         <div class="wrap">
           <h2>Plain-English glossary</h2>
           <p>
-            Every option in the studio, explained in one line — with a link to the source so you can
-            read more. None of it changes your mark: a fixed (hash, grammar) pair is frozen forever.
+            Every option in the studio, explained in one line, with a link to the source so you can
+            read more. The hash fixes your glyph; the style only changes how it is drawn.
           </p>
 
           <h3 class="glossary-head">Hashes</h3>
           <dl class="glossary">
             {hashGlossary.map((h) => (
               <div class="glossary-row">
-                <dt><code class="mono">{h.id}</code> {h.label}</dt>
+                <dt><code class="mono">{h.id}</code> {h.label}{h.tier === 'strong' ? '' : ` (${h.tier})`}</dt>
                 <dd>{h.blurb} <a href={h.href} rel="noopener" target="_blank">{h.source} ↗</a></dd>
               </div>
             ))}
           </dl>
 
-          <h3 class="glossary-head">Visual grammars</h3>
+          <h3 class="glossary-head">Render styles</h3>
           <dl class="glossary">
-            {grammarGlossary.map((g) => (
+            {styleGlossary.map((s) => (
               <div class="glossary-row">
-                <dt><code class="mono">{g.id}</code> {g.label}</dt>
-                <dd>{g.blurb} <a href={g.href} rel="noopener" target="_blank">{g.source} ↗</a></dd>
+                <dt><code class="mono">{s.id}</code> {s.label}</dt>
+                <dd>{s.blurb} <a href={s.href} rel="noopener" target="_blank">{s.source} ↗</a></dd>
               </div>
             ))}
           </dl>

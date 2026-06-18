@@ -1,9 +1,9 @@
 import {
   type Glyph,
-  GRAMMARS,
   generateGlyph,
   renderQrSvg,
   renderSvg,
+  STYLES,
   type SvgOptions,
   tryNormalizeSeed,
 } from '@eshlox/hashglyph-core';
@@ -38,7 +38,7 @@ export function initGenerator(): void {
   const controls = {
     seed: el<HTMLInputElement>('seed'),
     hash: el<HTMLSelectElement>('hash'),
-    grammar: el<HTMLSelectElement>('grammar'),
+    style: el<HTMLSelectElement>('style'),
     fg: el<HTMLInputElement>('fg'),
     bg: el<HTMLInputElement>('bg'),
     transparent: el<HTMLInputElement>('transparent'),
@@ -46,12 +46,14 @@ export function initGenerator(): void {
     padding: el<HTMLInputElement>('padding'),
     qr: el<HTMLInputElement>('qr-toggle'),
     qrUrl: el<HTMLInputElement>('qr-url'),
+    verifySeed: el<HTMLInputElement>('verify-seed'),
   };
 
   const view = {
     preview: el<HTMLDivElement>('preview'),
     digest: el<HTMLElement>('digest'),
     material: el<HTMLElement>('material'),
+    verifyResult: el<HTMLElement>('verify-result'),
     permalink: el<HTMLInputElement>('permalink'),
     contrast: el<HTMLElement>('contrast-warning'),
     matrix: el<HTMLDivElement>('matrix'),
@@ -64,7 +66,7 @@ export function initGenerator(): void {
   // Reflect initial state into the controls.
   controls.seed.value = state.seed;
   controls.hash.value = state.hash;
-  controls.grammar.value = state.grammar;
+  controls.style.value = state.style;
   controls.fg.value = state.fg;
   controls.bg.value = state.bg;
   controls.transparent.checked = state.transparent;
@@ -108,7 +110,7 @@ export function initGenerator(): void {
       return;
     }
 
-    const glyph = generateGlyph({ seed: state.seed, hash: state.hash, grammar: state.grammar });
+    const glyph = generateGlyph({ seed: state.seed, hash: state.hash, style: state.style });
     const svg = renderSvg(glyph, svgOptions());
     current = { glyph, svg };
 
@@ -117,6 +119,7 @@ export function initGenerator(): void {
     view.material.textContent = glyph.material;
 
     updatePermalink();
+    runVerify();
 
     // Contrast warning (only meaningful for hex on a visible background).
     const ratio = state.transparent ? null : contrastRatio(state.fg, state.bg);
@@ -128,22 +131,37 @@ export function initGenerator(): void {
 
   function renderMatrix(): void {
     view.matrix.replaceChildren();
-    for (const grammar of GRAMMARS) {
-      const g = generateGlyph({ seed: state.seed, hash: state.hash, grammar: grammar.id });
+    for (const style of STYLES) {
+      const g = generateGlyph({ seed: state.seed, hash: state.hash, style: style.id });
       const swatch = renderSvg(g, { fg: '#0b0e14', bg: '#ffffff', padding: 1, scale: 16 });
       const button = document.createElement('button');
       button.type = 'button';
-      button.className = `matrix-cell${grammar.id === state.grammar ? ' is-active' : ''}`;
-      button.title = `${grammar.label}: ${grammar.description}`;
-      button.setAttribute('aria-pressed', String(grammar.id === state.grammar));
-      button.innerHTML = `<span class="matrix-art">${stripProlog(swatch)}</span><span class="matrix-label">${grammar.label}</span>`;
+      button.className = `matrix-cell${style.id === state.style ? ' is-active' : ''}`;
+      button.title = `${style.label}: ${style.description}`;
+      button.setAttribute('aria-pressed', String(style.id === state.style));
+      button.innerHTML = `<span class="matrix-art">${stripProlog(swatch)}</span><span class="matrix-label">${style.label}</span>`;
       button.addEventListener('click', () => {
-        state.grammar = grammar.id;
-        controls.grammar.value = grammar.id;
+        state.style = style.id;
+        controls.style.value = style.id;
         render();
       });
       view.matrix.append(button);
     }
+  }
+
+  /** Prove the displayed glyph really belongs to a name the visitor types. */
+  function runVerify(): void {
+    const probe = controls.verifySeed.value;
+    if (!current || tryNormalizeSeed(probe) === null) {
+      view.verifyResult.textContent = '';
+      view.verifyResult.dataset.state = '';
+      return;
+    }
+    const match =
+      generateGlyph({ seed: probe, hash: state.hash, style: state.style }).digestHex ===
+      current.glyph.digestHex;
+    view.verifyResult.textContent = match ? '✓ matches this glyph' : '✗ different glyph';
+    view.verifyResult.dataset.state = match ? 'ok' : 'bad';
   }
 
   function renderQr(): void {
@@ -163,10 +181,11 @@ export function initGenerator(): void {
     state.hash = controls.hash.value as GlyphState['hash'];
     render();
   });
-  controls.grammar.addEventListener('change', () => {
-    state.grammar = controls.grammar.value as GlyphState['grammar'];
+  controls.style.addEventListener('change', () => {
+    state.style = controls.style.value as GlyphState['style'];
     render();
   });
+  controls.verifySeed.addEventListener('input', runVerify);
   controls.fg.addEventListener('input', () => {
     state.fg = controls.fg.value;
     render();

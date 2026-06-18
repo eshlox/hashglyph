@@ -308,6 +308,18 @@ button.btn:disabled {
   font-size: 0.85rem;
   margin-top: 8px;
 }
+.verify-result {
+  font-size: 0.85rem;
+  margin-top: 8px;
+  min-height: 1.1em;
+  font-family: var(--mono);
+}
+.verify-result[data-state="ok"] {
+  color: var(--accent);
+}
+.verify-result[data-state="bad"] {
+  color: var(--danger);
+}
 
 .provenance {
   margin-top: 18px;
@@ -336,13 +348,8 @@ button.btn:disabled {
 /* ---- Matrix ---- */
 .matrix {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 10px;
-}
-@media (max-width: 520px) {
-  .matrix {
-    grid-template-columns: repeat(3, 1fr);
-  }
 }
 .matrix-cell {
   display: flex;

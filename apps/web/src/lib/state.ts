@@ -1,18 +1,18 @@
 import {
-  DEFAULT_GRAMMAR,
   DEFAULT_HASH,
-  type GrammarId,
+  DEFAULT_STYLE,
   type HashId,
-  isGrammarId,
   isHashId,
   isSafeColor,
+  isStyleId,
+  type StyleId,
 } from '@eshlox/hashglyph-core';
 
 /** The full, validated UI state, also the shape encoded in the permalink. */
 export interface GlyphState {
   seed: string;
   hash: HashId;
-  grammar: GrammarId;
+  style: StyleId;
   fg: string;
   bg: string;
   transparent: boolean;
@@ -36,7 +36,7 @@ export const QR_URL_WARN_LENGTH = 120;
 export const DEFAULT_STATE: GlyphState = {
   seed: 'hashglyph',
   hash: DEFAULT_HASH,
-  grammar: DEFAULT_GRAMMAR,
+  style: DEFAULT_STYLE,
   fg: '#0b0e14',
   bg: '#ffffff',
   transparent: false,
@@ -84,13 +84,13 @@ export function parseState(search: string | URLSearchParams): GlyphState {
   const seed = rawSeed.trim().length > 0 ? rawSeed : DEFAULT_STATE.seed;
 
   const hashParam = params.get('hash');
-  const grammarParam = params.get('grammar');
+  const styleParam = params.get('style');
   const qrUrlParam = params.get('qrurl');
 
   return {
     seed,
     hash: hashParam && isHashId(hashParam) ? hashParam : DEFAULT_STATE.hash,
-    grammar: grammarParam && isGrammarId(grammarParam) ? grammarParam : DEFAULT_STATE.grammar,
+    style: styleParam && isStyleId(styleParam) ? styleParam : DEFAULT_STATE.style,
     fg: safeColor(params.get('fg'), DEFAULT_STATE.fg),
     bg: safeColor(params.get('bg'), DEFAULT_STATE.bg),
     transparent: params.get('transparent') === '1',
@@ -107,7 +107,7 @@ export function toQuery(state: GlyphState): string {
   const params = new URLSearchParams();
   if (state.seed !== DEFAULT_STATE.seed) params.set('seed', state.seed);
   if (state.hash !== DEFAULT_STATE.hash) params.set('hash', state.hash);
-  if (state.grammar !== DEFAULT_STATE.grammar) params.set('grammar', state.grammar);
+  if (state.style !== DEFAULT_STATE.style) params.set('style', state.style);
   if (state.fg !== DEFAULT_STATE.fg) params.set('fg', state.fg);
   if (state.bg !== DEFAULT_STATE.bg) params.set('bg', state.bg);
   if (state.transparent) params.set('transparent', '1');

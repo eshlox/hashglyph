@@ -1,10 +1,10 @@
 // @vitest-environment jsdom
-import { GRAMMARS, HASHES } from '@eshlox/hashglyph-core';
+import { HASHES, STYLES } from '@eshlox/hashglyph-core';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { initGenerator } from '../src/scripts/generator.ts';
 
 const hashOptions = HASHES.map((h) => `<option value="${h.id}">${h.label}</option>`).join('');
-const grammarOptions = GRAMMARS.map((g) => `<option value="${g.id}">${g.label}</option>`).join('');
+const styleOptions = STYLES.map((s) => `<option value="${s.id}">${s.label}</option>`).join('');
 
 /** Build the minimal DOM that initGenerator expects. */
 function buildDom(search = ''): void {
@@ -13,13 +13,15 @@ function buildDom(search = ''): void {
     <input id="seed" type="text" />
     <p id="seed-error" hidden></p>
     <select id="hash">${hashOptions}</select>
-    <select id="grammar">${grammarOptions}</select>
+    <select id="style">${styleOptions}</select>
     <input id="fg" type="color" />
     <input id="bg" type="color" />
     <input id="transparent" type="checkbox" />
     <input id="rounded" type="checkbox" />
     <input id="padding" type="range" min="0" max="4" />
     <input id="qr-toggle" type="checkbox" />
+    <input id="verify-seed" type="text" />
+    <p id="verify-result" data-state=""></p>
     <div id="preview"></div>
     <code id="digest"></code>
     <code id="material"></code>
@@ -48,16 +50,27 @@ describe('initGenerator (jsdom: core runs against the DOM)', () => {
 
   it('renders the canonical mark on load', () => {
     initGenerator();
-    expect(document.getElementById('digest')?.textContent).toMatch(/^bfd24b02/);
-    expect(document.getElementById('material')?.textContent).toBe(
-      'hashglyph-core-accents-v1|hashglyph',
+    expect(document.getElementById('digest')?.textContent).toBe(
+      '70d824582c9c3e3560c255cbba79e7ead272920df7054db08c68ee58fcfd60e7',
     );
+    expect(document.getElementById('material')?.textContent).toBe('hashglyph-v2|hashglyph');
     expect(document.getElementById('preview')?.innerHTML).toContain('<svg');
   });
 
-  it('populates the grammar matrix with every grammar', () => {
+  it('populates the style picker with every style', () => {
     initGenerator();
-    expect(document.querySelectorAll('#matrix .matrix-cell')).toHaveLength(GRAMMARS.length);
+    expect(document.querySelectorAll('#matrix .matrix-cell')).toHaveLength(STYLES.length);
+  });
+
+  it('verifies a matching name and rejects a different one', () => {
+    initGenerator();
+    const probe = document.getElementById('verify-seed') as HTMLInputElement;
+    probe.value = 'HashGlyph';
+    fire('verify-seed');
+    expect(document.getElementById('verify-result')?.dataset.state).toBe('ok');
+    probe.value = 'someone-else';
+    fire('verify-seed');
+    expect(document.getElementById('verify-result')?.dataset.state).toBe('bad');
   });
 
   it('updates the glyph and permalink when the seed changes', () => {
@@ -72,10 +85,10 @@ describe('initGenerator (jsdom: core runs against the DOM)', () => {
   });
 
   it('hydrates from URL params (permalink round-trip)', () => {
-    buildDom('?seed=portal&grammar=quad-fold-v1&hash=sha256');
+    buildDom('?seed=portal&style=color-8&hash=sha256');
     initGenerator();
     expect((document.getElementById('seed') as HTMLInputElement).value).toBe('portal');
-    expect((document.getElementById('grammar') as HTMLSelectElement).value).toBe('quad-fold-v1');
+    expect((document.getElementById('style') as HTMLSelectElement).value).toBe('color-8');
     expect((document.getElementById('hash') as HTMLSelectElement).value).toBe('sha256');
   });
 
