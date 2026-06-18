@@ -39,8 +39,8 @@ export type HashId =
  * - `strong`: ≥256-bit, modern. Two seeds sharing a glyph is infeasible (~2^128).
  * - `reduced`: native digest is under 256 bits, so the glyph's real entropy is
  *   capped below the canvas. Not broken, but a smaller safety margin.
- * - `broken`: collisions can be constructed deliberately — two different strings
- *   can be forced to the same glyph. Fun only; never relied on for uniqueness.
+ * - `broken`: collisions can be constructed deliberately, so two different
+ *   strings can be forced to the same glyph. Fun only; never trusted for uniqueness.
  */
 export type HashTier = 'strong' | 'reduced' | 'broken';
 

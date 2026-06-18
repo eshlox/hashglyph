@@ -49,12 +49,12 @@ const styleGlossary = STYLES.map((s) => ({ id: s.id, label: s.label, ...STYLE_NO
 
     <main>
       <section class="wrap hero">
-        <span class="eyebrow">deterministic · BLAKE3-seeded · 9×9</span>
+        <span class="eyebrow">deterministic · BLAKE3 · 256-bit · reversible</span>
         <h1>A name in. <span class="grad">A glyph out.</span><br />Always the same one.</h1>
         <p class="lead">
-          HashGlyph hashes a word into a constrained pixel grammar to mint a compact digital
-          signature: part monogram, part favicon, part terminal-era artifact. Same seed, same mark,
-          forever.
+          HashGlyph draws every bit of a 256-bit hash into a pixel grid, so each name gets its own
+          glyph: unique, reproducible, and readable straight back into its digest. Same seed, same
+          mark, forever.
         </p>
         <div class="slogans">
           <span>your name, compiled to pixels</span>
@@ -82,7 +82,7 @@ const styleGlossary = STYLES.map((s) => ({ id: s.id, label: s.label, ...STYLE_NO
                 <label for="hash">Hash</label>
                 <select id="hash">
                   {HASHES.map((h) => (
-                    <option value={h.id}>{h.label}{h.tier === 'strong' ? '' : ` — ${h.tier}`}</option>
+                    <option value={h.id}>{h.label}{h.tier === 'strong' ? '' : ` (${h.tier})`}</option>
                   ))}
                 </select>
               </div>

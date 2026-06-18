@@ -1,38 +1,40 @@
 # HashGlyph
 
-**A name in. A glyph out. Always the same one.**
+**A name in. A glyph out. Always the same one, and never the same as anyone else's.**
 
 HashGlyph turns any word into a deterministic, pixel-based logo. The seed is
-normalized, hashed with **BLAKE3**, and mapped onto a constrained 9×9 visual
-grammar. The same seed always gives the same mark. It reads like part monogram,
-part favicon, part terminal-era artifact.
+normalized, hashed to a full **256-bit digest**, and every bit of that digest is
+drawn into the grid. Nothing is thrown away, so the glyph is a lossless picture
+of the hash: two different names landing on the same glyph is computationally
+infeasible, and a glyph reads straight back into its digest.
 
 ```
-·········
-·███████·     blake3( hashglyph-core-accents-v1 | hashglyph )
-·██···██·       = bfd24b02875f3d34…f2ee0010
-·█·███·█·
-·███████·     seed:    hashglyph        ← the project's own mark
-·█·███·█·     hash:    blake3
-·██···██·     grammar: core-accents-v1   (default)
-·███████·
-·········     (type any word to mint your own)
+·███····██·██···
+··█··█···█·██···   blake3( hashglyph-v2 | hashglyph )
+··█·██··█··███··     = 70d824582c9c3e35…fcfd60e7   (the 256-bit identity)
+··█████···██·█·█
+·██·····██····█·   seed:  hashglyph        ← the project's own mark
+·█·█·█·███··█·██   hash:  blake3
+█·███·█··████··█   style: mono-16          (default; 8x8 color-8 also ships)
+███··██████·█·█·
+ …                 (type any word to mint your own)
 ```
 
 → **Live generator: [hashglyph.eshlox.net](https://hashglyph.eshlox.net)**
 
 ---
 
-## Why it works as a logo
+## Why it works
 
-Most generated identicons look random. HashGlyph keeps the **brand structure
-designed** and lets the **hash drive only the accents**:
-
-- **deterministic:** the same input always yields the same mark;
+- **deterministic:** the same input always yields the same glyph;
+- **unique:** the whole 256-bit hash is on the wall, so with a strong hash a
+  collision between two names is infeasible (~2^128 work);
+- **reversible:** decode a glyph back to its digest, or prove a name produced it;
 - **personal:** the seed is your own name;
-- **technical:** it comes straight out of a cryptographic hash;
-- **scalable:** it stays crisp from a 16px favicon to a wall-sized SVG;
-- **story-driven:** it's a compressed digital signature, not a generic icon.
+- **scalable:** it stays crisp from a 16px favicon to a wall-sized SVG.
+
+A glyph is a visual fingerprint of a one-way hash. You can recover the digest
+from it, but never the original text.
 
 ## Quick start
 
@@ -44,21 +46,26 @@ npx @eshlox/hashglyph-cli generate eshlox --json --ascii
 
 # or install globally
 npm i -g @eshlox/hashglyph-cli
-hashglyph generate your-name         # SVG + JSON + PNG set → ./dist
-hashglyph favicon your-name          # full favicon/PWA set + favicon.ico
-hashglyph og your-name               # 1200×630 Open Graph card
+hashglyph generate your-name                    # SVG + JSON + PNG set → ./dist
+hashglyph generate your-name --style color-8    # 8x8 color mosaic
+hashglyph favicon your-name                     # full favicon/PWA set + favicon.ico
+hashglyph og your-name                          # 1200x630 Open Graph card
 hashglyph qr https://you.dev --seed your-name   # QR with a centered glyph
-hashglyph ascii your-name            # print it to your terminal
-hashglyph list                       # all hashes × grammars
+hashglyph decode your-name.svg                  # read the digest back out
+hashglyph verify your-name.svg your-name        # prove a name produced a glyph
+hashglyph list                                  # all hashes (with tiers) + styles
 ```
 
 ### Library
 
 ```ts
-import { generateGlyph, renderSvg } from '@eshlox/hashglyph-core';
+import { generateGlyph, renderSvg, decodeGlyphHex, verifyGlyph } from '@eshlox/hashglyph-core';
 
-const glyph = generateGlyph({ seed: 'your-name' });   // hash + grammar are pluggable
+const glyph = generateGlyph({ seed: 'your-name' });   // hash + style are pluggable
 const svg = renderSvg(glyph, { fg: '#0b0e14', bg: '#ffffff', padding: 1 });
+
+decodeGlyphHex(glyph.grid, 'mono-16');                     // → the 256-bit digest, hex
+verifyGlyph(glyph.grid, 'mono-16', 'your-name', 'blake3'); // → true
 ```
 
 ## The determinism contract
@@ -66,42 +73,45 @@ const svg = renderSvg(glyph, { fg: '#0b0e14', bg: '#ffffff', padding: 1 });
 The input to the hash is a domain-separated material string:
 
 ```
-${grammar.materialId}|${normalize(seed)}      normalize = NFKC · trim · lowercase
+hashglyph-v2|${normalize(seed)}      normalize = NFKC · trim · lowercase
 ```
 
-The hash name is intentionally **not** part of the material, so swapping hashes
-diverges naturally while a fixed `(hash, grammar)` pair stays frozen forever.
+The hash name and the style are intentionally **not** part of the material, so a
+fixed `(hash, seed)` pair yields one canonical 256-bit digest. The two styles
+just render that digest differently, and swapping the hash diverges naturally.
 
-The default grammar is `core-accents-v1`. HashGlyph's own logo is just the glyph
-for the seed `hashglyph`, and you can verify it yourself:
+HashGlyph's own logo is just the glyph for the seed `hashglyph`, and you can
+verify the digest yourself:
 
 ```js
 import { blake3 } from '@noble/hashes/blake3.js';
 import { bytesToHex, utf8ToBytes } from '@noble/hashes/utils.js';
 
-bytesToHex(blake3(utf8ToBytes('hashglyph-core-accents-v1|hashglyph'), { dkLen: 64 }));
-// → bfd24b02875f3d34cd6e99511319eb8c3933bd54563973a40dfec2c8833e27ad…
+bytesToHex(blake3(utf8ToBytes('hashglyph-v2|hashglyph'), { dkLen: 32 }));
+// → 70d824582c9c3e3560c255cbba79e7ead272920df7054db08c68ee58fcfd60e7
 ```
 
-Hash bits are read **most-significant-first**; the first 8 bits decide the eight
-accent pixels. Every seed gets the same treatment, so your name maps to exactly
-one mark, forever.
+Digest bits are read **most-significant-first**: in `mono-16` each bit is one of
+256 pixels; in `color-8` each group of 4 bits picks one of 16 palette colors.
 
-## Algorithms: hash × grammar
+## Algorithms: hash × style
 
-It's pluggable on two axes: **17 hashes × 5 grammars = 85 combinations**. The
-default combo mints the canonical mark; the rest are yours to explore.
+The **hash decides the glyph**; the **style only decides how it is drawn**. There
+are **17 hashes** rendered in **2 styles**.
 
-| Hashes | Grammars |
+| | |
 | --- | --- |
-| `blake3` (default), `blake2b`, `blake2s`, `sha256`, `sha224`, `sha384`, `sha512`, `sha512-256`, `sha3-256`, `sha3-512`, `shake128`, `shake256`, `keccak256`, `keccak512`, `ripemd160`, `sha1`, `md5` | `core-accents-v1` (canonical), `mirror-identicon-v1`, `symmetric-mask-v1`, `quad-fold-v1`, `cellular-automata-v1` |
+| **Hashes (strong)** | `blake3` (default), `blake2b`, `blake2s`, `sha256`, `sha384`, `sha512`, `sha512-256`, `sha3-256`, `sha3-512`, `shake128`, `shake256`, `keccak256`, `keccak512` |
+| **Hashes (reduced margin)** | `sha224`, `ripemd160` |
+| **Hashes (broken, fun only)** | `sha1`, `md5` |
+| **Styles** | `mono-16` (default, 16x16 black & white), `color-8` (8x8, 16-color mosaic) |
 
-Extendable-output functions (BLAKE3, SHAKE) fill the grammar's bit budget with
-their native XOF — BLAKE3's 64-byte digest is exactly the canonical one. Every
-other hash is expanded with an HKDF-style counter construction. `sha1`/`md5` are
-cryptographically broken and included only for recognizability — the glyph is a
-visual mark, not a security boundary. Every grammar is mirror-symmetric, so
-output reads as a *mark*, not noise.
+Both styles encode exactly 256 bits, so a glyph is a complete picture of its
+digest. Extendable-output functions (BLAKE3, SHAKE) emit those 256 bits natively;
+fixed-length hashes are stretched with an HKDF-style counter construction, which
+never adds entropy beyond the hash's native width. `sha1`/`md5` are
+cryptographically broken: collisions can be constructed on purpose, so they
+cannot honor the "no two names collide" guarantee and are included for fun only.
 
 ## CLI reference
 
@@ -109,12 +119,14 @@ output reads as a *mark*, not noise.
 | --- | --- |
 | `generate <seed>` | SVG, optional JSON metadata, PNG set (`--size`, `--json`, `--ascii`, `--no-png`) |
 | `favicon <seed>` | 16/32/48/180/192/512 PNGs + `favicon.ico` + `site.webmanifest` |
-| `og <seed>` | 1200×630 Open Graph card (`--title --slogan --url`) |
+| `og <seed>` | 1200x630 Open Graph card (`--title --slogan --url`) |
 | `qr <url>` | QR code, optionally with a centered glyph (`--seed`) |
+| `decode <file>` | Read the 256-bit digest back out of a HashGlyph SVG |
+| `verify <file> <seed>` | Check that an SVG is the glyph a given seed produces |
 | `ascii <seed>` | Print the glyph to the terminal |
-| `list` | List available hashes and grammars |
+| `list` | List available hashes (with tiers) and styles |
 
-Shared options: `--hash --grammar --fg --bg --rounded --padding --scale --out`.
+Shared glyph options: `--hash --style --fg --bg --rounded --padding --scale --out`.
 
 ## Repository layout
 
@@ -131,7 +143,7 @@ brand/          frozen, reproducible brand assets
 pnpm install
 pnpm build:packages  # build core + cli (TS project references)
 pnpm build           # build the deployable site → ./dist
-pnpm test            # vitest: 180+ unit/property/security tests
+pnpm test            # vitest: unit/property/security tests
 pnpm typecheck       # tsc --build
 pnpm check           # biome lint + format
 pnpm dev:web         # run the site locally
@@ -153,9 +165,8 @@ plus a few dashboard settings.
    right pnpm: `"packageManager": "pnpm@11.7.0"`. Without this you get
    `No preset version installed for command pnpm`.
 2. `.nvmrc` pins the build's Node version (`24.13.1`), which is what Cloudflare
-   Pages reads to pick the runtime (it's the newest Node the Pages build image
-   currently offers). `engines` requires `"node": ">=24.13.1"` to match, so
-   local, CI, and Cloudflare all build on the same Node.
+   Pages reads to pick the runtime. `engines` requires `"node": ">=24.13.1"` to
+   match, so local, CI, and Cloudflare all build on the same Node.
 3. `pnpm-workspace.yaml` whitelists the native install scripts Astro needs via
    `allowBuilds: { esbuild: true, sharp: true }`.
 
@@ -172,24 +183,25 @@ pnpm, so you don't override the install command.
 | Install command | `pnpm install` (auto) |
 | Root directory | `/` |
 
-`pnpm build` compiles `@eshlox/hashglyph-core` first and then the Astro app (the
-site imports the core engine). Even though this is a monorepo, Astro is
-configured (`outDir: '../../dist'`) to emit to the repo-root `dist/`, so
-Cloudflare's default output directory finds it with no extra dashboard config.
-Point your custom domain `hashglyph.eshlox.net` at the Pages project and you're
-done.
+`pnpm build` compiles `@eshlox/hashglyph-core` first and then the Astro app. Even
+though this is a monorepo, Astro is configured (`outDir: '../../dist'`) to emit to
+the repo-root `dist/`, so Cloudflare's default output directory finds it with no
+extra dashboard config. Point your custom domain `hashglyph.eshlox.net` at the
+Pages project and you're done.
 
 ## Stability policy
 
-The canonical mark must never change. Grammars are pinned with a version suffix
-and frozen on release. To evolve the visual system, register a **new** grammar
-(e.g. `core-accents-v2`) and never edit a shipped `-v1`. See [CONTRIBUTING.md](./CONTRIBUTING.md).
+The encoding is frozen behind `MATERIAL_SCHEMA = 'v2'`: the material recipe, the
+256-bit digest width, and each style's bit layout. Changing any of them changes
+every glyph, so they only move under a new schema version. See
+[CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## Security
 
 Untrusted seeds are escape-by-construction safe in SVG output, colors are
 validated against an allowlist, and CLI filenames can never escape the output
-directory. See [SECURITY.md](./SECURITY.md).
+directory. A glyph is a one-way fingerprint: it exposes the digest, never the
+seed. See [SECURITY.md](./SECURITY.md).
 
 ## License
 

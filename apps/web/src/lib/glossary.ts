@@ -17,7 +17,7 @@ const FIPS_202 = 'https://csrc.nist.gov/pubs/fips/202/final';
 export const HASH_NOTES: Record<HashId, GlossaryNote> = {
   blake3: {
     blurb:
-      'Fast modern hash that can stretch to any output length on its own. HashGlyph’s default — it mints the canonical mark.',
+      'Fast modern hash that can stretch to any output length on its own. HashGlyph’s default; it mints the canonical mark.',
     href: 'https://github.com/BLAKE3-team/BLAKE3',
     source: 'BLAKE3 spec',
   },
@@ -49,7 +49,7 @@ export const HASH_NOTES: Record<HashId, GlossaryNote> = {
     source: 'NIST FIPS 180-4',
   },
   sha512: {
-    blurb: 'The wide SHA-2 variant — faster than SHA-256 on 64-bit CPUs.',
+    blurb: 'The wide SHA-2 variant, faster than SHA-256 on 64-bit CPUs.',
     href: FIPS_180_4,
     source: 'NIST FIPS 180-4',
   },
@@ -70,7 +70,7 @@ export const HASH_NOTES: Record<HashId, GlossaryNote> = {
     source: 'NIST FIPS 202',
   },
   shake128: {
-    blurb: 'A SHA-3 “XOF” — like SHA-3 but can emit as many bytes as you ask for.',
+    blurb: 'A SHA-3 “XOF”: like SHA-3 but can emit as many bytes as you ask for.',
     href: FIPS_202,
     source: 'NIST FIPS 202',
   },
@@ -80,7 +80,7 @@ export const HASH_NOTES: Record<HashId, GlossaryNote> = {
     source: 'NIST FIPS 202',
   },
   keccak256: {
-    blurb: 'Original-padding Keccak — the exact hash Ethereum uses everywhere.',
+    blurb: 'Original-padding Keccak, the exact hash Ethereum uses everywhere.',
     href: 'https://keccak.team/keccak.html',
     source: 'keccak.team',
   },
@@ -102,7 +102,7 @@ export const HASH_NOTES: Record<HashId, GlossaryNote> = {
   },
   md5: {
     blurb:
-      'The classic 128-bit checksum. Broken for security — fine for non-security IDs, included for recognizability.',
+      'The classic 128-bit checksum. Broken for security, but fine for non-security IDs and included for recognizability.',
     href: 'https://www.rfc-editor.org/rfc/rfc1321',
     source: 'RFC 1321',
   },

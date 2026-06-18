@@ -6,7 +6,7 @@ import type { CommandResult } from '../artifacts.js';
 function tierTag(tier: HashTier): string {
   if (tier === 'strong') return pc.green('strong');
   if (tier === 'reduced') return pc.yellow('reduced');
-  return pc.red('broken — not collision-safe');
+  return pc.red('broken (not collision-safe)');
 }
 
 /** `list`: show every available hash (with tier) and render style. No files written. */

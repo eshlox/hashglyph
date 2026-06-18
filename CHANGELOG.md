@@ -2,22 +2,37 @@
 
 All notable changes to HashGlyph are documented here. The project adheres to
 [Semantic Versioning](https://semver.org/). Generated glyphs follow a separate
-**stability policy**: a shipped `-vN` grammar never changes; new behaviour ships
-as a new versioned grammar.
+**stability policy**: the encoding is frozen behind a `MATERIAL_SCHEMA` version;
+changing it ships as a new schema version.
 
 ## [Unreleased]
 
+### Changed (breaking)
+
+- **Reversible, unique 256-bit glyphs**: a glyph now encodes the full 256-bit
+  digest losslessly, so two different names sharing a glyph is computationally
+  infeasible under a strong hash, and a glyph decodes straight back to its
+  digest. The five visual grammars are replaced by two render **styles**:
+  `mono-16` (16x16 black & white, 1 bit per pixel) and `color-8` (8x8, 4 bits
+  per cell over a fixed 16-color palette). The digest depends only on the
+  `(hash, seed)` pair, so both styles render the same identity two ways.
+  `MATERIAL_SCHEMA` moves to `v2` and the material prefix to `hashglyph-v2|`, so
+  every glyph changes. The CLI/web option `--grammar`/`grammar` becomes
+  `--style`/`style`.
+
 ### Added
 
+- **Decode and verify**: `decodeGlyph`/`decodeGlyphHex` recover the digest from a
+  glyph grid, and `verifyGlyph` proves a `(seed, hash)` pair produced a glyph.
+  Exposed on the CLI as `hashglyph decode <file>` and `hashglyph verify <file>
+  <seed>`, and as a verify box in the web studio. The original seed stays
+  unrecoverable (hashing is one-way).
+- **Hash honesty tiers**: every hash now carries a `tier` (`strong`, `reduced`,
+  `broken`), surfaced in `list`, the web hash picker, and the glossary so the
+  collision-unsafe hashes (MD5, SHA-1) are clearly flagged.
 - **More hashes (6 → 17)**: BLAKE2b, BLAKE2s, SHA-224, SHA-384, SHA-512/256,
-  SHAKE128, SHAKE256, Keccak-512, RIPEMD-160, SHA-1, and MD5 join the registry —
-  now **17 hashes × 5 grammars = 85 combinations**. SHAKE uses its native XOF
-  like BLAKE3; the rest use the existing counter expansion. SHA-1/MD5 are
-  cryptographically broken and included only for recognizability. Additive and
-  non-breaking: the canonical BLAKE3 mark is untouched.
-- **Website glossary**: a plain-English section explaining every hash, grammar,
-  and pipeline concept (normalization, domain separation, XOF, counter
-  expansion, bitstream, QR), each with a link to its authoritative source.
+  SHAKE128, SHAKE256, Keccak-512, RIPEMD-160, SHA-1, and MD5 join the registry.
+  SHAKE uses its native XOF like BLAKE3; the rest use the counter expansion.
 
 ### Fixed
 

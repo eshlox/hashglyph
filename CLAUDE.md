@@ -26,5 +26,5 @@ When you do write a commit message, the subject line must:
 
 - Always question requests before implementing. Ask _why_ before _how_.
 - Proactively voice concerns before proceeding if something seems wrong, unnecessary, or overcomplicated. Do not wait to be asked.
-- Propose better alternatives when possible — but voicing concerns is valuable even without one.
+- Propose better alternatives when possible, but voicing concerns is valuable even without one.
 - This applies to direct requests too. If there was a solid reason behind your original approach (e.g., avoiding duplication, better separation of concerns), push back with clear reasoning instead of silently complying.

@@ -6,7 +6,7 @@ uses. They are byte-reproducible. CI regenerates them and fails if anything
 drifts (`pnpm brand:verify`).
 
 ```
-blake3( hashglyph-core-accents-v1 | hashglyph ) = bfd24b02875f3d34…f2ee0010
+blake3( hashglyph-v2 | hashglyph ) = 70d824582c9c3e35…fcfd60e7
 ```
 
 ## Files
@@ -14,13 +14,13 @@ blake3( hashglyph-core-accents-v1 | hashglyph ) = bfd24b02875f3d34…f2ee0010
 | File | Purpose |
 | --- | --- |
 | `assets/hashglyph-deterministic-glyph.svg` | Master logo (vector source of truth) |
-| `assets/hashglyph-deterministic-glyph.json` | Provenance: seed, digest, grid, accents |
+| `assets/hashglyph-deterministic-glyph.json` | Provenance: seed, digest, grid |
 | `assets/favicon.svg` | SVG favicon |
 | `assets/favicon.ico` | Multi-size ICO (16/32/48) |
 | `assets/hashglyph-{16,32,48,180,192,512}.png` | Raster icons |
-| `assets/apple-touch-icon.png` | 180×180 Apple touch icon |
+| `assets/apple-touch-icon.png` | 180x180 Apple touch icon |
 | `assets/site.webmanifest` | PWA manifest |
-| `assets/og-image.{svg,png}` | 1200×630 Open Graph card |
+| `assets/og-image.{svg,png}` | 1200x630 Open Graph card |
 | `assets/hashglyph-qr.{svg,png}` | QR to hashglyph.eshlox.net with the glyph |
 
 ## Regenerating
@@ -34,7 +34,6 @@ pnpm brand:verify      # regenerate and assert no git diff
 ## Stability policy
 
 HashGlyph's own mark (like every glyph) must never change. The algorithm is
-pinned by the material string `hashglyph-core-accents-v1|hashglyph` and the
-BLAKE3 hash. To evolve the visual system, add a **new** versioned grammar (e.g.
-`core-accents-v2`) and never edit a shipped `-v1`. See the root `README.md` and
-`CONTRIBUTING.md`.
+pinned by the material string `hashglyph-v2|hashglyph` and the BLAKE3 hash. To
+evolve the encoding, bump `MATERIAL_SCHEMA` to a new version rather than editing
+the current one. See the root `README.md` and `CONTRIBUTING.md`.

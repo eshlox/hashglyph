@@ -34,7 +34,7 @@ directory.
 
 ### 4. Permalink robustness (web)
 
-`?seed`/`?hash`/`?grammar`/`?fg`/`?bg`/`?padding` are validated and clamped;
+`?seed`/`?hash`/`?style`/`?fg`/`?bg`/`?padding` are validated and clamped;
 unknown or unsafe values fall back to safe defaults. Parsing **never throws**,
 so a hand-crafted URL can only ever produce a valid glyph. Seed length is capped.
 
