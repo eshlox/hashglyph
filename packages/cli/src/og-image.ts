@@ -43,7 +43,7 @@ export function renderOgSvg(glyph: Glyph, options: OgOptions = {}): string {
   const title = options.title ?? 'HashGlyph';
   const slogan = options.slogan ?? 'Deterministic pixel glyphs.';
   const url = options.url ?? 'hashglyph.eshlox.net';
-  const sub = `${glyph.hashId} x ${glyph.grammarId}`;
+  const sub = `${glyph.hashId} x ${glyph.styleId}`;
 
   // Glyph card (left).
   const card = { x: 80, y: 115, size: 400, pad: 46 };

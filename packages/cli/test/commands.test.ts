@@ -45,8 +45,9 @@ describe('runGenerate', () => {
     expect(json).toBeDefined();
     const meta = JSON.parse(json?.data as string);
     expect(meta.normalized).toBe('hashglyph');
-    expect(meta.digestHex).toMatch(/^bfd24b02/);
-    expect(meta.grid).toHaveLength(9);
+    expect(meta.digestHex).toBe('70d824582c9c3e3560c255cbba79e7ead272920df7054db08c68ee58fcfd60e7');
+    expect(meta.styleId).toBe('mono-16');
+    expect(meta.grid).toHaveLength(16);
 
     const png = byName(artifacts, '-32.png');
     expect(isPng(png?.data as Uint8Array)).toBe(true);

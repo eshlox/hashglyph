@@ -14,7 +14,7 @@ export function runAscii(input: AsciiInput): CommandResult {
   const glyph = generateGlyph({
     seed: input.seed,
     hash: input.options.hash,
-    grammar: input.options.grammar,
+    style: input.options.style,
   });
   const art = gridToAscii(glyph.grid, '██', '  ');
   const block = input.color ? pc.cyan(art) : art;
@@ -26,7 +26,7 @@ export function runAscii(input: AsciiInput): CommandResult {
       block,
       '',
       `${pc.dim('seed     ')}${glyph.normalized}`,
-      `${pc.dim('algo     ')}${glyph.hashId} × ${glyph.grammarId}`,
+      `${pc.dim('algo     ')}${glyph.hashId} × ${glyph.styleId}`,
       `${pc.dim('digest   ')}${glyph.digestHex.slice(0, 32)}…`,
     ],
   };

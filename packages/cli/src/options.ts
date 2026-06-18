@@ -1,17 +1,17 @@
 import {
-  type GrammarId,
   type HashId,
-  isGrammarId,
   isHashId,
   isSafeColor,
+  isStyleId,
   type PixelShape,
+  type StyleId,
   type SvgOptions,
 } from '@eshlox/hashglyph-core';
 
 /** Raw string options as parsed by commander. */
 export interface RawGlyphOptions {
   hash?: string;
-  grammar?: string;
+  style?: string;
   fg?: string;
   bg?: string;
   rounded?: boolean;
@@ -22,7 +22,7 @@ export interface RawGlyphOptions {
 /** Validated, typed glyph + render options. */
 export interface ResolvedGlyphOptions {
   hash: HashId;
-  grammar: GrammarId;
+  style: StyleId;
   svg: SvgOptions;
 }
 
@@ -39,6 +39,22 @@ export const MAX_PADDING = 64;
 export const MAX_SCALE = 512;
 /** Hard cap on the QR payload length (matches the web app; longer codes scan poorly). */
 export const MAX_QR_URL_LENGTH = 512;
+
+/** Validate a render-style id, throwing a clean error on an unknown value. */
+export function parseStyle(value: string): StyleId {
+  if (!isStyleId(value)) {
+    throw new OptionError(`Unknown --style "${value}".`);
+  }
+  return value;
+}
+
+/** Validate a hash id, throwing a clean error on an unknown value. */
+export function parseHash(value: string): HashId {
+  if (!isHashId(value)) {
+    throw new OptionError(`Unknown --hash "${value}".`);
+  }
+  return value;
+}
 
 /** Validate a QR payload, rejecting empty or over-cap input with a clean error. */
 export function parseQrUrl(value: string): string {
@@ -87,9 +103,9 @@ export function resolveGlyphOptions(raw: RawGlyphOptions): ResolvedGlyphOptions 
   if (!isHashId(hash)) {
     throw new OptionError(`Unknown --hash "${hash}".`);
   }
-  const grammar = raw.grammar ?? 'core-accents-v1';
-  if (!isGrammarId(grammar)) {
-    throw new OptionError(`Unknown --grammar "${grammar}".`);
+  const style = raw.style ?? 'mono-16';
+  if (!isStyleId(style)) {
+    throw new OptionError(`Unknown --style "${style}".`);
   }
 
   const pixel: PixelShape = raw.rounded ? 'rounded' : 'square';
@@ -111,7 +127,7 @@ export function resolveGlyphOptions(raw: RawGlyphOptions): ResolvedGlyphOptions 
     ...(scale !== undefined ? { scale } : {}),
   };
 
-  return { hash, grammar, svg };
+  return { hash, style, svg };
 }
 
 /** Default PNG export sizes (favicon-friendly, spec-aligned). */

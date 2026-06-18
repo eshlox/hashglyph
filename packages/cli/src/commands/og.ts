@@ -16,7 +16,7 @@ export async function runOg(input: OgInput): Promise<CommandResult> {
   const glyph = generateGlyph({
     seed: input.seed,
     hash: input.options.hash,
-    grammar: input.options.grammar,
+    style: input.options.style,
   });
   const svg = renderOgSvg(glyph, input.og);
   const png = await svgToPngSized(svg, 1200, 630);

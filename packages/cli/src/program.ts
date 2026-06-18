@@ -1,18 +1,23 @@
+import { readFile } from 'node:fs/promises';
 import { Command, CommanderError } from 'commander';
 import pc from 'picocolors';
 import type { CommandResult } from './artifacts.js';
 import { runAscii } from './commands/ascii.js';
+import { runDecode } from './commands/decode.js';
 import { runFavicon } from './commands/favicon.js';
 import { runGenerate } from './commands/generate.js';
 import { runList } from './commands/list.js';
 import { runOg } from './commands/og.js';
 import { runQr } from './commands/qr.js';
+import { runVerify } from './commands/verify.js';
 import type { IO } from './io.js';
 import {
   DEFAULT_PNG_SIZES,
   MAX_RENDER_SIZE,
+  parseHash,
   parseQrUrl,
   parseRenderSize,
+  parseStyle,
   type RawGlyphOptions,
   resolveGlyphOptions,
 } from './options.js';
@@ -28,11 +33,11 @@ interface BuildOptions {
   exitOverride?: boolean;
 }
 
-/** Hash + grammar selection (which glyph), plus its colours. */
+/** Hash + style selection (which glyph), plus its colours. */
 function addGlyphPickerOptions(cmd: Command): Command {
   return cmd
     .option('--hash <id>', 'hash function (see `list`)', 'blake3')
-    .option('--grammar <id>', 'visual grammar (see `list`)', 'core-accents-v1')
+    .option('--style <id>', 'render style (see `list`)', 'mono-16')
     .option('--fg <color>', 'foreground color (hex/name)')
     .option('--bg <color>', 'background color, or "none" for transparent');
 }
@@ -161,8 +166,34 @@ export function buildProgram(opts: BuildOptions): Command {
   });
 
   program
+    .command('decode <file>')
+    .description('Read the digest back out of a HashGlyph SVG')
+    .option('--style <id>', 'render style of the SVG', 'mono-16')
+    .action(async (file: string, raw: { style: string }) => {
+      const svg = await readFile(file, 'utf8');
+      printResult(runDecode({ svg, style: parseStyle(raw.style) }));
+    });
+
+  program
+    .command('verify <file> <seed>')
+    .description('Check that a HashGlyph SVG is the glyph for a given seed')
+    .option('--hash <id>', 'hash the seed was generated with', 'blake3')
+    .option('--style <id>', 'render style of the SVG', 'mono-16')
+    .action(async (file: string, seed: string, raw: { hash: string; style: string }) => {
+      const svg = await readFile(file, 'utf8');
+      const result = runVerify({
+        svg,
+        seed,
+        hash: parseHash(raw.hash),
+        style: parseStyle(raw.style),
+      });
+      printResult(result);
+      if (!result.ok) process.exitCode = 1;
+    });
+
+  program
     .command('list')
-    .description('List available hashes and grammars')
+    .description('List available hashes and styles')
     .action(() => {
       printResult(runList());
     });

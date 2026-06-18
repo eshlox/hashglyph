@@ -7,11 +7,13 @@
 
 export type { Artifact, CommandResult } from './artifacts.js';
 export { runAscii } from './commands/ascii.js';
+export { runDecode } from './commands/decode.js';
 export { runFavicon } from './commands/favicon.js';
 export { runGenerate } from './commands/generate.js';
 export { runList } from './commands/list.js';
 export { runOg } from './commands/og.js';
 export { runQr } from './commands/qr.js';
+export { runVerify } from './commands/verify.js';
 export { consoleIO, type IO } from './io.js';
 export { type OgOptions, renderOgSvg } from './og-image.js';
 export {

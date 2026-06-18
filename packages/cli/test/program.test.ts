@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { type Artifact, buildProgram, type IO } from '../src/index.js';
+import {
+  type Artifact,
+  buildProgram,
+  type IO,
+  resolveGlyphOptions,
+  runDecode,
+  runGenerate,
+  runVerify,
+} from '../src/index.js';
 
 function fakeIO(): { io: IO; out: string[]; err: string[] } {
   const out: string[] = [];
@@ -27,20 +35,21 @@ async function run(argv: string[], io: IO, write = spyWrite().write) {
 }
 
 describe('CLI program', () => {
-  it('list prints all hashes and grammars', async () => {
+  it('list prints all hashes (with tiers) and styles', async () => {
     const { io, out } = fakeIO();
     await run(['list'], io);
     const text = out.join('\n');
     expect(text).toContain('blake3');
-    expect(text).toContain('core-accents-v1');
-    expect(text).toContain('85 combinations');
+    expect(text).toContain('mono-16');
+    expect(text).toContain('color-8');
+    expect(text).toContain('broken'); // md5/sha1 are flagged
   });
 
   it('ascii prints the grid and provenance, writes nothing', async () => {
     const { io, out } = fakeIO();
     const { calls, write } = spyWrite();
     await run(['ascii', 'hashglyph', '--no-color'], io, write);
-    expect(out.join('\n')).toContain('blake3 × core-accents-v1');
+    expect(out.join('\n')).toContain('blake3 × mono-16');
     expect(calls).toHaveLength(0);
   });
 
@@ -101,9 +110,37 @@ describe('CLI program', () => {
     expect(svg).toContain('#00ff00');
   });
 
+  it('rejects an unknown style with a clean error', async () => {
+    const { io } = fakeIO();
+    await expect(run(['generate', 'hashglyph', '--style', 'nope', '--no-png'], io)).rejects.toThrow(
+      /Unknown --style/,
+    );
+  });
+
   it('supports --version', async () => {
     const { io, out } = fakeIO();
     await expect(run(['--version'], io)).rejects.toThrow(); // exitOverride throws on version
     expect(out.join('\n')).toContain('1.0.0');
   });
+});
+
+describe('decode / verify round-trip on generated SVG', () => {
+  async function svgFor(seed: string, style: 'mono-16' | 'color-8'): Promise<string> {
+    const options = resolveGlyphOptions({ style });
+    const result = await runGenerate({ seed, options, sizes: [], json: false, ascii: false });
+    return result.artifacts.find((a) => a.name.endsWith('.svg'))?.data as string;
+  }
+
+  for (const style of ['mono-16', 'color-8'] as const) {
+    it(`decodes a ${style} SVG back to its digest and verifies the seed`, async () => {
+      const svg = await svgFor('acme', style);
+      const digestLine = runDecode({ svg, style }).summary.find((l) => l.includes('digest'));
+      expect(digestLine).toMatch(/[0-9a-f]{64}/);
+
+      // Case-insensitive seed (normalization) still verifies; wrong seed/hash do not.
+      expect(runVerify({ svg, style, seed: 'ACME', hash: 'blake3' }).ok).toBe(true);
+      expect(runVerify({ svg, style, seed: 'other', hash: 'blake3' }).ok).toBe(false);
+      expect(runVerify({ svg, style, seed: 'acme', hash: 'sha256' }).ok).toBe(false);
+    });
+  }
 });

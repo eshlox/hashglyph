@@ -18,12 +18,10 @@ function metadataJson(glyph: ReturnType<typeof generateGlyph>): string {
     seed: glyph.seed,
     normalized: glyph.normalized,
     hashId: glyph.hashId,
-    grammarId: glyph.grammarId,
-    materialId: glyph.materialId,
+    styleId: glyph.styleId,
     material: glyph.material,
     digestHex: glyph.digestHex,
     grid: glyph.grid,
-    decisions: glyph.decisions,
     schema: MATERIAL_SCHEMA,
     generator: '@eshlox/hashglyph-cli',
   };
@@ -33,7 +31,7 @@ function metadataJson(glyph: ReturnType<typeof generateGlyph>): string {
 /** `generate`: the core command: SVG (+ optional JSON + PNGs) for a seed. */
 export async function runGenerate(input: GenerateInput): Promise<CommandResult> {
   const { seed, options, sizes, json, ascii } = input;
-  const glyph = generateGlyph({ seed, hash: options.hash, grammar: options.grammar });
+  const glyph = generateGlyph({ seed, hash: options.hash, style: options.style });
   const svg = renderSvg(glyph, options.svg);
   const base = slugify(glyph.normalized);
 
@@ -54,7 +52,7 @@ export async function runGenerate(input: GenerateInput): Promise<CommandResult> 
   }
   summary.push(
     `seed       ${glyph.normalized}`,
-    `algorithm  ${glyph.hashId} × ${glyph.grammarId}`,
+    `algorithm  ${glyph.hashId} × ${glyph.styleId}`,
     `digest     ${glyph.digestHex.slice(0, 32)}…`,
   );
 

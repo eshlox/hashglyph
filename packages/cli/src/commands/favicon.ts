@@ -34,7 +34,7 @@ export async function runFavicon(input: FaviconInput): Promise<CommandResult> {
   const glyph = generateGlyph({
     seed: input.seed,
     hash: input.options.hash,
-    grammar: input.options.grammar,
+    style: input.options.style,
   });
   const svg = renderSvg(glyph, input.options.svg);
   const base = slugify(glyph.normalized);

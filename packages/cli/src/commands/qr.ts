@@ -16,7 +16,7 @@ export interface QrInput {
 /** `qr`: a QR code (optionally with a centered glyph) as SVG + PNG. */
 export async function runQr(input: QrInput): Promise<CommandResult> {
   const glyph = input.seed
-    ? generateGlyph({ seed: input.seed, hash: input.options.hash, grammar: input.options.grammar })
+    ? generateGlyph({ seed: input.seed, hash: input.options.hash, style: input.options.style })
     : null;
   const svg = renderQrSvg(input.url, glyph, input.colors ?? {});
   const png = await svgToPng(svg, input.size);
