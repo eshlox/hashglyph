@@ -31,6 +31,9 @@ function el<T extends HTMLElement>(id: string): T {
   return node as T;
 }
 
+/** Below this WCAG ratio a glyph reads as "washed out" at favicon sizes. */
+const MIN_CONTRAST = 1.6;
+
 /** Wire up the interactive generator. Called once on DOMContentLoaded. */
 export function initGenerator(): void {
   const state: GlyphState = parseState(window.location.search);
@@ -56,6 +59,7 @@ export function initGenerator(): void {
     verifyResult: el<HTMLElement>('verify-result'),
     permalink: el<HTMLInputElement>('permalink'),
     contrast: el<HTMLElement>('contrast-warning'),
+    fgField: el<HTMLElement>('fg-field'),
     matrix: el<HTMLDivElement>('matrix'),
     qrPreview: el<HTMLDivElement>('qr-preview'),
     qrWrap: el<HTMLElement>('qr-section'),
@@ -95,7 +99,30 @@ export function initGenerator(): void {
     view.permalink.value = `${window.location.origin}${url}`;
   }
 
+  // Pixel color only applies to the monochrome style; color-8 has a fixed palette.
+  const isColorStyle = (): boolean => state.style === 'color-8';
+
+  /**
+   * Whether to warn about legibility. Mono compares ink vs background. Color-8
+   * only lets the user change the background, so warn only when even the
+   * best-contrasting palette color is washed out against it (not when any single
+   * hue clashes — a 15-color mosaic always has some).
+   */
+  function lowContrast(glyph: Glyph): boolean {
+    if (state.transparent) return false;
+    if (!isColorStyle()) {
+      const ratio = contrastRatio(state.fg, state.bg);
+      return ratio !== null && ratio < MIN_CONTRAST;
+    }
+    const ratios = glyph.palette
+      .filter((color): color is string => color !== null)
+      .map((color) => contrastRatio(color, state.bg))
+      .filter((ratio): ratio is number => ratio !== null);
+    return ratios.length > 0 && Math.max(...ratios) < MIN_CONTRAST;
+  }
+
   function render(): void {
+    view.fgField.hidden = isColorStyle();
     const normalized = tryNormalizeSeed(state.seed);
     view.seedError.hidden = normalized !== null;
     if (normalized === null) {
@@ -122,9 +149,8 @@ export function initGenerator(): void {
     updatePermalink();
     runVerify();
 
-    // Contrast warning (only meaningful for hex on a visible background).
-    const ratio = state.transparent ? null : contrastRatio(state.fg, state.bg);
-    view.contrast.hidden = !(ratio !== null && ratio < 1.6);
+    // Contrast warning (only meaningful on a visible background).
+    view.contrast.hidden = !lowContrast(glyph);
 
     renderMatrix();
     if (state.qrMode) renderQr();

@@ -14,7 +14,7 @@ function buildDom(search = ''): void {
     <p id="seed-error" hidden></p>
     <select id="hash">${hashOptions}</select>
     <select id="style">${styleOptions}</select>
-    <input id="fg" type="color" />
+    <div id="fg-field"><input id="fg" type="color" /></div>
     <input id="bg" type="color" />
     <input id="transparent" type="checkbox" />
     <input id="rounded" type="checkbox" />
@@ -60,6 +60,17 @@ describe('initGenerator (jsdom: core runs against the DOM)', () => {
   it('populates the style picker with every style', () => {
     initGenerator();
     expect(document.querySelectorAll('#matrix .matrix-cell')).toHaveLength(STYLES.length);
+  });
+
+  it('hides the pixel-color control for the color style (it has a fixed palette)', () => {
+    buildDom('?style=mono-16');
+    initGenerator();
+    expect(document.getElementById('fg-field')?.hidden).toBe(false);
+
+    const style = document.getElementById('style') as HTMLSelectElement;
+    style.value = 'color-8';
+    fire('style', 'change');
+    expect(document.getElementById('fg-field')?.hidden).toBe(true);
   });
 
   it('verifies a matching name and rejects a different one', () => {
