@@ -3,6 +3,7 @@ import { generateGlyph, HASHES, renderSvg, STYLES } from '@eshlox/hashglyph-core
 import Seo from '../components/Seo.astro';
 import { CONCEPTS, HASH_NOTES, STYLE_NOTES } from '../lib/glossary';
 import { SITE, SITE_DESCRIPTION, SITE_TITLE, SOCIAL_LINKS } from '../lib/site';
+import { PADDING_MAX } from '../lib/state';
 import '../styles/global.css';
 
 const TITLE = SITE_TITLE;
@@ -105,7 +106,7 @@ const styleGlossary = STYLES.map((s) => ({ id: s.id, label: s.label, ...STYLE_NO
               </div>
               <div class="field">
                 <label for="padding">Quiet zone</label>
-                <input id="padding" type="range" min="0" max="4" step="1" />
+                <input id="padding" type="range" min="0" max={PADDING_MAX} step="1" />
               </div>
             </div>
 

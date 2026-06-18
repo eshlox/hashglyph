@@ -33,6 +33,11 @@ describe('parseState', () => {
     expect(parseState('seed=%20%20').seed).toBe(DEFAULT_STATE.seed);
   });
 
+  it('accepts quiet-zone padding up to the max and rejects beyond it', () => {
+    expect(parseState('padding=12').padding).toBe(12);
+    expect(parseState('padding=13').padding).toBe(DEFAULT_STATE.padding);
+  });
+
   it('accepts a URLSearchParams instance', () => {
     expect(parseState(new URLSearchParams({ seed: 'x' })).seed).toBe('x');
   });

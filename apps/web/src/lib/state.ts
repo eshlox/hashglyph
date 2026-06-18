@@ -27,6 +27,9 @@ export interface GlyphState {
 /** Hard cap on seed length accepted from the URL / input (defense-in-depth). */
 export const SEED_MAX_LENGTH = 64;
 
+/** Largest quiet-zone padding (in cells) the studio slider and permalink accept. */
+export const PADDING_MAX = 12;
+
 /** Hard cap on the QR payload length (longer codes get hard to scan with a logo). */
 export const QR_URL_MAX_LENGTH = 512;
 
@@ -63,7 +66,7 @@ export function normalizeQrUrl(raw: string): string {
 function clampPadding(value: string | null): number {
   if (value === null) return DEFAULT_STATE.padding;
   const n = Number(value);
-  if (!Number.isInteger(n) || n < 0 || n > 6) return DEFAULT_STATE.padding;
+  if (!Number.isInteger(n) || n < 0 || n > PADDING_MAX) return DEFAULT_STATE.padding;
   return n;
 }
 
