@@ -37,6 +37,21 @@ export const MAX_RENDER_SIZE = 8192;
 export const MAX_PADDING = 64;
 /** Hard cap on SVG pixels-per-cell. */
 export const MAX_SCALE = 512;
+/** Hard cap on the QR payload length (matches the web app; longer codes scan poorly). */
+export const MAX_QR_URL_LENGTH = 512;
+
+/** Validate a QR payload, rejecting empty or over-cap input with a clean error. */
+export function parseQrUrl(value: string): string {
+  if (value.length === 0) {
+    throw new OptionError('QR url must not be empty.');
+  }
+  if (value.length > MAX_QR_URL_LENGTH) {
+    throw new OptionError(
+      `QR url must be at most ${MAX_QR_URL_LENGTH} characters, got ${value.length}.`,
+    );
+  }
+  return value;
+}
 
 function parseIntOption(label: string, value: string | undefined, max: number): number | undefined {
   if (value === undefined) return undefined;

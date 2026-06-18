@@ -55,8 +55,9 @@ export function normalizeQrUrl(raw: string): string {
   const trimmed = raw.trim().slice(0, QR_URL_MAX_LENGTH);
   if (trimmed.length === 0) return DEFAULT_STATE.qrUrl;
   // Already has a scheme (http:, https:, mailto:, tel:, etc.)? Keep as-is.
-  if (/^[a-z][a-z0-9+.-]*:/i.test(trimmed)) return trimmed;
-  return `https://${trimmed}`;
+  const normalized = /^[a-z][a-z0-9+.-]*:/i.test(trimmed) ? trimmed : `https://${trimmed}`;
+  // Re-cap after prepending the scheme so the payload honors the hard cap.
+  return normalized.slice(0, QR_URL_MAX_LENGTH);
 }
 
 function clampPadding(value: string | null): number {

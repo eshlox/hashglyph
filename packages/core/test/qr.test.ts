@@ -53,4 +53,19 @@ describe('QR rendering', () => {
     const svg = renderQrSvg('"><script>alert(1)</script>', null);
     expect(svg).not.toMatch(/<script/i);
   });
+
+  it('never emits NaN or Infinity coordinates for non-finite options', () => {
+    for (const bad of [Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]) {
+      const svg = renderQrSvg(URL, glyph, { quietZone: bad, glyphCoverage: bad });
+      expect(svg).not.toMatch(/NaN|Infinity/);
+    }
+  });
+
+  it('clamps negative and huge quiet zones to a finite value', () => {
+    // Negative quiet zone clamps to 0: no negative coordinates leak into rects.
+    expect(renderQrSvg(URL, null, { quietZone: -5 })).not.toMatch(/(?:x|y)="-/);
+    const huge = renderQrSvg(URL, null, { quietZone: 1000 });
+    expect(huge).not.toMatch(/NaN|Infinity/);
+    expect(huge).toContain('<svg');
+  });
 });

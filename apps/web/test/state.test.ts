@@ -75,6 +75,11 @@ describe('normalizeQrUrl', () => {
   it('caps very long payloads', () => {
     expect(normalizeQrUrl(`https://x.com/${'a'.repeat(1000)}`).length).toBeLessThanOrEqual(512);
   });
+
+  it('honors the cap after prepending the https:// scheme', () => {
+    // A bare 512-char value must not overflow the cap once `https://` is added.
+    expect(normalizeQrUrl('a'.repeat(512)).length).toBeLessThanOrEqual(512);
+  });
 });
 
 describe('toQuery', () => {

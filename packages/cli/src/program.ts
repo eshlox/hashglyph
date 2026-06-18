@@ -11,6 +11,7 @@ import type { IO } from './io.js';
 import {
   DEFAULT_PNG_SIZES,
   MAX_RENDER_SIZE,
+  parseQrUrl,
   parseRenderSize,
   type RawGlyphOptions,
   resolveGlyphOptions,
@@ -136,7 +137,8 @@ export function buildProgram(opts: BuildOptions): Command {
       .option('--out <dir>', 'output directory', 'dist')
       .option('--seed <seed>', 'embed a glyph generated from this seed')
       .option('--size <px>', 'PNG size', '1024'),
-  ).action(async (url: string, raw: RawGlyphOptions & QrFlags) => {
+  ).action(async (rawUrl: string, raw: RawGlyphOptions & QrFlags) => {
+    const url = parseQrUrl(rawUrl);
     const options = resolveGlyphOptions(raw);
     const size = parseRenderSize('size', raw.size);
     // --fg/--bg recolour the QR (the centered glyph inherits them). The other

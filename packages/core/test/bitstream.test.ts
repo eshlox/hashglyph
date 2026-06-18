@@ -55,4 +55,11 @@ describe('BitStream', () => {
     expect(() => bs.bits(33)).toThrow(RangeError);
     expect(() => bs.bits(-1)).toThrow(RangeError);
   });
+
+  it('rejects fractional and NaN bit counts', () => {
+    const bs = new BitStream(new Uint8Array(8));
+    expect(() => bs.bits(1.5)).toThrow(RangeError);
+    expect(() => bs.bits(Number.NaN)).toThrow(RangeError);
+    expect(() => bs.bits(Number.POSITIVE_INFINITY)).toThrow(RangeError);
+  });
 });

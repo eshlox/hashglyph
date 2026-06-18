@@ -45,8 +45,10 @@ export function renderQrSvg(data: string, glyph: Glyph | null, options: QrOption
   const bg = assertSafeColor('bg', options.bg ?? '#ffffff');
   const glyphFg = assertSafeColor('glyphFg', options.glyphFg ?? fg);
   const glyphBg = assertSafeColor('glyphBg', options.glyphBg ?? bg);
-  const quiet = Math.max(0, Math.floor(options.quietZone ?? 4));
-  const coverage = Math.min(0.3, Math.max(0.1, options.glyphCoverage ?? 0.3));
+  const quietRaw = options.quietZone ?? 4;
+  const quiet = Number.isFinite(quietRaw) ? Math.max(0, Math.floor(quietRaw)) : 4;
+  const coverageRaw = options.glyphCoverage ?? 0.3;
+  const coverage = Number.isFinite(coverageRaw) ? Math.min(0.3, Math.max(0.1, coverageRaw)) : 0.3;
 
   const qr = buildQrMatrix(data, level);
   const n = qr.size;

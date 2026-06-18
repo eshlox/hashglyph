@@ -45,8 +45,8 @@ export class BitStream {
 
   /** Read `count` bits (0–32) as an unsigned big-endian integer. */
   bits(count: number): number {
-    if (count < 0 || count > 32) {
-      throw new RangeError(`bits(count): count must be in 0..32, got ${count}.`);
+    if (!Number.isInteger(count) || count < 0 || count > 32) {
+      throw new RangeError(`bits(count): count must be an integer in 0..32, got ${count}.`);
     }
     let value = 0;
     for (let i = 0; i < count; i += 1) {

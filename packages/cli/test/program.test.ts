@@ -81,6 +81,13 @@ describe('CLI program', () => {
     );
   });
 
+  it('rejects an over-cap qr payload with a clean error', async () => {
+    const { io } = fakeIO();
+    await expect(run(['qr', `https://x.test/${'a'.repeat(512)}`], io)).rejects.toThrow(
+      /at most 512 characters/,
+    );
+  });
+
   it('passes --fg/--bg through to the QR code', async () => {
     const { io } = fakeIO();
     const { calls, write } = spyWrite();
